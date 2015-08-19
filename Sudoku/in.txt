@@ -9,7 +9,7 @@ vww zzx AAB
 CCC DEF FGB
 HHD DEI IGB
 a=7 b=13 c=9 d=17 e=6 f=14 g=4 h=21 i=17 j=16 k=11 l=13 m=5
-n=12 o=9 p=16 q=5 r=22 s=12 t=7 u=5 v=14 w=18 x=17 y=18 z=5
+n=12 o=9 p=16 q=5 r=22 s=12 t=7 u=5 v=14 w=18 x=17 y=9 z=5
 A=5 B=15 C=12 D=23 E=5 F=8 G=14 H=4 I=15
 
 Jigsaw Sudoku http://www.sudoku.org.uk/jigsaw.asp
