@@ -133,6 +133,24 @@ namespace Sudoku
                 f(listener);
         }
 
+        void PaintCages(PaintContext context, Pen thick)
+        {
+            for (int x = 0; x < 8; ++x)
+                for (int y = 0; y < 9; ++y)
+                    if (CageAt(x, y) != CageAt(x + 1, y))
+                        context.DrawVerticalLine(x, y, thick);
+            for (int x = 0; x < 9; ++x)
+                for (int y = 0; y < 8; ++y)
+                    if (CageAt(x, y) != CageAt(x, y + 1))
+                        context.DrawHorizontalLine(x, y, thick);
+        }
+
+        void PaintCageTotals(PaintContext context)
+        {
+            for (int i = 0; i < cage_totals.Length; ++i)
+                context.DrawTotal(Brushes.Black, cage_indicators[i].X, cage_indicators[i].Y, cage_totals[i].ToString());
+        }
+
         public void Paint(PaintContext context)
         {
             Graphics graphics = context.graphics;
@@ -154,19 +172,14 @@ namespace Sudoku
             }
 
             // Cages
-            if (cages != null) using (Pen thick = new Pen(Color.LightBlue, 7.0f))
-                {
-                    for (int x = 0; x < 8; ++x)
-                        for (int y = 0; y < 9; ++y)
-                            if (CageAt(x, y) != CageAt(x + 1, y))
-                                context.DrawVerticalLine(x, y, thick);
-                    for (int x = 0; x < 9; ++x)
-                        for (int y = 0; y < 8; ++y)
-                            if (CageAt(x, y) != CageAt(x, y + 1))
-                                context.DrawHorizontalLine(x, y, thick);
-                    for (int i = 0; i < cage_totals.Length; ++i)
-                        context.DrawTotal(Brushes.Black, cage_indicators[i].X, cage_indicators[i].Y, cage_totals[i].ToString());
-                }
+            if (cages != null)
+            {
+                using (Pen outer = new Pen(Color.LightBlue, 11.0f))
+                    PaintCages(context, outer);
+                using (Pen inner = new Pen(Color.White, 5.0f))
+                    PaintCages(context, inner);
+                PaintCageTotals(context);
+            }
 
             foreach (Hint hint in paintedHints)
                 hint.PaintBackground(context);
