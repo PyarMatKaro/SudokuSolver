@@ -78,7 +78,15 @@ namespace Sudoku
             Point p = SubcellLocation(x * 3 + x2, y * 3 + y2);
             string s = (n + 1).ToString();
             SizeF sz = graphics.MeasureString(s, SmallFont);
-            graphics.DrawString((n + 1).ToString(), SmallFont, br, p.X + (csz.Width - sz.Width) / 2, p.Y + (csz.Height - sz.Height) / 2);
+            graphics.DrawString(s, SmallFont, br, p.X + (csz.Width - sz.Width) / 2, p.Y + (csz.Height - sz.Height) / 2);
+        }
+
+        public void DrawTotal(Brush br, int x, int y, string s)
+        {
+            Size csz = SubcellSize;
+            Point p = SubcellLocation(x * 3, y * 3);
+            SizeF sz = graphics.MeasureString(s, SmallFont);
+            graphics.DrawString(s, SmallFont, br, p.X + (csz.Width - sz.Width) / 2, p.Y + (csz.Height - sz.Height) / 2);
         }
 
         public void DrawVerticalLine(int x, int y, Pen p)

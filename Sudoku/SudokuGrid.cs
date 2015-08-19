@@ -22,6 +22,7 @@ namespace Sudoku
         bool requestedHint;
         List<UpdateListener> listeners = new List<UpdateListener>();
         int[,] values, boxes, cages;
+        Point[] cage_indicators;
         int[] cage_totals;
         SudokuSolver solver;
         bool diagonal;
@@ -71,6 +72,11 @@ namespace Sudoku
         public int BoxAt(int x, int y)
         {
             return boxes[x, y];
+        }
+
+        public int CageAt(int x, int y)
+        {
+            return cages[x, y];
         }
 
         public CellFlags FlagAt(int x, int y)
@@ -146,6 +152,21 @@ namespace Sudoku
                         context.FillCell(x, 8 - x, Brushes.LightGray);
                 }
             }
+
+            // Cages
+            if (cages != null) using (Pen thick = new Pen(Color.LightBlue, 7.0f))
+                {
+                    for (int x = 0; x < 8; ++x)
+                        for (int y = 0; y < 9; ++y)
+                            if (CageAt(x, y) != CageAt(x + 1, y))
+                                context.DrawVerticalLine(x, y, thick);
+                    for (int x = 0; x < 9; ++x)
+                        for (int y = 0; y < 8; ++y)
+                            if (CageAt(x, y) != CageAt(x, y + 1))
+                                context.DrawHorizontalLine(x, y, thick);
+                    for (int i = 0; i < cage_totals.Length; ++i)
+                        context.DrawTotal(Brushes.Black, cage_indicators[i].X, cage_indicators[i].Y, cage_totals[i].ToString());
+                }
 
             foreach (Hint hint in paintedHints)
                 hint.PaintBackground(context);
@@ -523,6 +544,7 @@ namespace Sudoku
                 return;
             cages = null;
             cage_totals = null;
+            cage_indicators = null;
             if (SetGridStrings9x9Jigsaw(a))
                 return;
             if (SetGridStrings9x9(a))
@@ -652,6 +674,10 @@ namespace Sudoku
                     cage_totals[this_cage] = tot;
                     if (this_cage == names.Count - 1)
                     {
+                        cage_indicators = new Point[names.Count];
+                        for (int y1 = 8; y1 >= 0; --y1)
+                            for (int x = 8; x >= 0; --x)
+                                cage_indicators[cages[x, y1]] = new Point(x, y1);
                         ResetSolver();
                         return true;
                     }
