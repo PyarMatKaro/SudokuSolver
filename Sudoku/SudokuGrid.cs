@@ -44,7 +44,7 @@ namespace Sudoku
             }
         }
 
-        CageInfo cageInfo;
+        public CageInfo cageInfo;
 
         public SudokuGrid(bool diagonal)
         {
@@ -108,6 +108,7 @@ namespace Sudoku
 
         public void ClearGrid(bool diagonal)
         {
+            this.cageInfo = null;
             this.diagonal = diagonal;
             values = new int[9, 9];
             flags = new CellFlags[9, 9];
@@ -120,6 +121,14 @@ namespace Sudoku
                     boxes[x, y] = DefaultBoxAt(x, y);
                 }
             solver = new SudokuSolver(this);
+        }
+
+        public bool IsKiller
+        {
+            get
+            {
+                return cageInfo != null;
+            }
         }
 
         public bool IsJigsaw
@@ -183,7 +192,7 @@ namespace Sudoku
             }
 
             // Cages
-            if (cageInfo != null)
+            if (IsKiller)
             {
                 Color[] colours = new Color[]{
                     Color.FromArgb(255,253,152),
@@ -515,10 +524,59 @@ namespace Sudoku
 
         public string[] GridStrings()
         {
+            if (IsKiller)
+                return GridStringsKiller;
             if (IsJigsaw)
                 return GridStringsJigsaw;
             else
                 return GridStringsNonJigsaw;
+        }
+
+        string[] GridStringsKiller
+        {
+            get
+            {
+                Dictionary<int, char> d = new Dictionary<int, char>();
+                char lc = 'a';
+                List<string> lg = new List<string>();
+                List<string> lq = new List<string>();
+                string lcl="";
+                for (int y = 0; y < 9; ++y)
+                {
+                    string gs = "";
+                    for (int x = 0; x < 9; ++x)
+                    {
+                        int ca = cageInfo.cages[x, y];
+                        char c;
+                        if (!d.TryGetValue(ca, out c))
+                        {
+                            c = lc;
+                            if (lc == 'z')
+                                lc = 'A';
+                            else if (lc == 'Z')
+                                lc = '0';
+                            else
+                                ++lc;
+                            d[ca] = c;
+                            string cs = c.ToString() + "=" + cageInfo.totals[ca];
+                            if (lcl.Length == 0)
+                                lcl = cs;
+                            else if (lcl.Length < 40)
+                                lcl += " " + cs;
+                            else
+                            {
+                                lq.Add(lcl);
+                                lcl = cs;
+                            }
+                        }
+                        gs += c;
+                    }
+                    lg.Add(gs);
+                }
+                lg.AddRange(lq);
+                lg.Add(lcl);
+                return lg.ToArray();
+            }
         }
 
         string[] GridStringsJigsaw
@@ -659,16 +717,10 @@ namespace Sudoku
 
         public bool SetGridStrings9x9Killer(string[] a)
         {
-            cageInfo = new CageInfo();
-            bool diags = false;
             List<string> l = new List<string>();
             int y = 0, i=0;
-            if (a[0].ToUpper().StartsWith("DIAG"))
-            {
-                diags = true;
-                i++;
-            }
-            ClearGrid(diags);
+            ClearGrid(false);
+            cageInfo = new CageInfo();
             Dictionary<char, int> names = new Dictionary<char, int>();
             for (int j = 0; j < 9; ++j)
             {
