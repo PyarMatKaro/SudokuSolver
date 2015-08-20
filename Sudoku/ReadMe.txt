@@ -15,6 +15,7 @@ Instrument solver performance, and variants such as casting out impossibles
 Try using contradiction hints on removing a row
 
 Killer, others
+Killer requires modifications to the solver
 
 Show contradiction hints with black pencil marks even when they are disabled, as well as the red pencil marks?
 

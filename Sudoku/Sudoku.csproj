@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColourSolver.cs" />
     <Compile Include="Houses.cs" />
     <Compile Include="PaintContext.cs" />
     <Compile Include="PickContext.cs" />

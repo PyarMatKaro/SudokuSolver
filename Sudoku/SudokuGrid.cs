@@ -21,13 +21,30 @@ namespace Sudoku
 
         bool requestedHint;
         List<UpdateListener> listeners = new List<UpdateListener>();
-        int[,] values, boxes, cages;
-        Point[] cage_indicators;
-        int[] cage_totals;
+        int[,] values, boxes;
         SudokuSolver solver;
         bool diagonal;
         HintOptions hintOptions = new HintOptions();
         Hint[] paintedHints = new Hint[0];
+
+        public class CageInfo
+        {
+            public int[,] cages;
+            public int[] totals, colours;
+
+            public CageInfo()
+            {
+                cages = new int[9, 9];
+            }
+
+            public void Colour(SudokuGrid grid)
+            {
+                ColourSolver cs = new ColourSolver();
+                cs.Solve(this, grid);
+            }
+        }
+
+        CageInfo cageInfo;
 
         public SudokuGrid(bool diagonal)
         {
@@ -76,7 +93,7 @@ namespace Sudoku
 
         public int CageAt(int x, int y)
         {
-            return cages[x, y];
+            return cageInfo.cages[x, y];
         }
 
         public CellFlags FlagAt(int x, int y)
@@ -145,12 +162,6 @@ namespace Sudoku
                         context.DrawHorizontalLine(x, y, thick);
         }
 
-        void PaintCageTotals(PaintContext context)
-        {
-            for (int i = 0; i < cage_totals.Length; ++i)
-                context.DrawTotal(Brushes.Black, cage_indicators[i].X, cage_indicators[i].Y, cage_totals[i].ToString());
-        }
-
         public void Paint(PaintContext context)
         {
             Graphics graphics = context.graphics;
@@ -172,13 +183,33 @@ namespace Sudoku
             }
 
             // Cages
-            if (cages != null)
+            if (cageInfo != null)
             {
-                using (Pen outer = new Pen(Color.LightBlue, 11.0f))
-                    PaintCages(context, outer);
-                using (Pen inner = new Pen(Color.White, 5.0f))
-                    PaintCages(context, inner);
-                PaintCageTotals(context);
+                Color[] colours = new Color[]{
+                    Color.FromArgb(255,253,152),
+                    Color.FromArgb(207,231,153),
+                    Color.FromArgb(203,232,250),
+                    Color.FromArgb(248,207,223)};
+                Brush[] cage_brushes = new Brush[4];
+                for (int i = 0; i < 4; ++i)
+                    cage_brushes[i] = new SolidBrush(colours[i]);
+                for (int x = 0; x < 9; ++x)
+                    for (int y = 0; y < 9; ++y)
+                        context.FillCell(x, y, cage_brushes[cageInfo.colours[CageAt(x, y)]]);
+
+                Point?[] cage_indicators = new Point?[cageInfo.totals.Length];
+                for (int y = 8; y >= 0; --y)
+                    for (int x = 8; x >= 0; --x)
+                        if(flags[x, y] == CellFlags.Free)
+                            cage_indicators[cageInfo.cages[x, y]] = new Point(x, y);
+                //using (Pen inner = new Pen(Color.White, 5.0f))
+                //    PaintCages(context, inner);
+                for (int i = 0; i < cageInfo.totals.Length; ++i)
+                    if(cage_indicators[i]!=null)
+                        context.DrawTotal(Brushes.Black,
+                            cage_indicators[i].Value.X, cage_indicators[i].Value.Y, cageInfo.totals[i].ToString());
+                for (int i = 0; i < 4; ++i)
+                    cage_brushes[i].Dispose();
             }
 
             foreach (Hint hint in paintedHints)
@@ -552,12 +583,9 @@ namespace Sudoku
 
         public void SetGridStrings(string[] a)
         {
-            cages = new int[9, 9];
             if (SetGridStrings9x9Killer(a))
                 return;
-            cages = null;
-            cage_totals = null;
-            cage_indicators = null;
+            cageInfo = null;
             if (SetGridStrings9x9Jigsaw(a))
                 return;
             if (SetGridStrings9x9(a))
@@ -631,6 +659,7 @@ namespace Sudoku
 
         public bool SetGridStrings9x9Killer(string[] a)
         {
+            cageInfo = new CageInfo();
             bool diags = false;
             List<string> l = new List<string>();
             int y = 0, i=0;
@@ -639,6 +668,7 @@ namespace Sudoku
                 diags = true;
                 i++;
             }
+            ClearGrid(diags);
             Dictionary<char, int> names = new Dictionary<char, int>();
             for (int j = 0; j < 9; ++j)
             {
@@ -657,13 +687,13 @@ namespace Sudoku
                     }
                     values[x, y] = -1;
                     flags[x, y] = CellFlags.Free;
-                    cages[x, y] = this_cage;
+                    cageInfo.cages[x, y] = this_cage;
                     boxes[x, y] = DefaultBoxAt(x, y);
                 }
                 y++;
                 i++;
             }
-            cage_totals = new int[names.Count];
+            cageInfo.totals = new int[names.Count];
             while (true)
             {
                 if (i >= a.Length)
@@ -684,13 +714,10 @@ namespace Sudoku
                     int this_cage;
                     if (!names.TryGetValue(c, out this_cage))
                         return false;
-                    cage_totals[this_cage] = tot;
+                    cageInfo.totals[this_cage] = tot;
                     if (this_cage == names.Count - 1)
                     {
-                        cage_indicators = new Point[names.Count];
-                        for (int y1 = 8; y1 >= 0; --y1)
-                            for (int x = 8; x >= 0; --x)
-                                cage_indicators[cages[x, y1]] = new Point(x, y1);
+                        cageInfo.Colour(this);
                         ResetSolver();
                         return true;
                     }
