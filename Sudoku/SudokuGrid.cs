@@ -30,7 +30,8 @@ namespace Sudoku
         public class CageInfo
         {
             public int[,] cages;
-            public int[] totals, running, sizes;
+            public int[] totals, sizes;
+            public int[] remaining_totals, remaining_sizes;
 
             public CageInfo()
             {
@@ -45,9 +46,13 @@ namespace Sudoku
                 for (int x = 0; x < 9; ++x)
                     for (int y = 0; y < 9; ++y)
                         ++sizes[cages[x, y]];
-                running = new int[NumCages];
+                remaining_totals = new int[NumCages];
+                remaining_sizes = new int[NumCages];
                 for (int i = 0; i < NumCages; ++i)
-                    running[i] = totals[i];
+                {
+                    remaining_totals[i] = totals[i];
+                    remaining_sizes[i] = sizes[i];
+                }
             }
         }
 
@@ -233,7 +238,7 @@ namespace Sudoku
                 for (int i = 0; i < NumCages; ++i)
                     if(cage_indicators[i]!=null)
                         context.DrawTotal(Brushes.Black,
-                            cage_indicators[i].Value.X, cage_indicators[i].Value.Y, cageInfo.running[i].ToString());
+                            cage_indicators[i].Value.X, cage_indicators[i].Value.Y, cageInfo.remaining_totals[i].ToString());
             }
 
             foreach (Hint hint in paintedHints)
@@ -568,7 +573,11 @@ namespace Sudoku
                     {
                         int ca = cageInfo.cages[x, y];
                         char c;
-                        if (!d.TryGetValue(ca, out c))
+                        if (cageInfo.sizes[ca] == 1)
+                        {
+                            c = (char)('0' + cageInfo.totals[ca]);
+                        }
+                        else if (!d.TryGetValue(ca, out c))
                         {
                             c = lc;
                             if (lc == 'z')

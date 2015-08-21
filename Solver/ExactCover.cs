@@ -33,18 +33,18 @@ namespace Solver
 
         protected void CoverRow(Tile r)
         {
-            r.k.OnCover(this);
             ts[tsc++] = r;
             for (Tile j = r.r; j != r; j = j.r)
                 j.c.Cover();
+            r.k.OnCover(this);
         }
 
         protected void UncoverRow()
         {
             Tile r = ts[--tsc];
+            r.k.OnUncover(this);
             for (Tile j = r.l; j != r; j = j.l)
                 j.c.Uncover();
-            r.k.OnUncover(this);
         }
 
         public bool Solved { get { return requirements.Right == requirements; } }
