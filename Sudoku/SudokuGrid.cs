@@ -30,11 +30,24 @@ namespace Sudoku
         public class CageInfo
         {
             public int[,] cages;
-            public int[] totals;
+            public int[] totals, running, sizes;
 
             public CageInfo()
             {
                 cages = new int[9, 9];
+            }
+
+            public int NumCages { get { return totals.Length; } }
+
+            public void Reset()
+            {
+                sizes = new int[NumCages];
+                for (int x = 0; x < 9; ++x)
+                    for (int y = 0; y < 9; ++y)
+                        ++sizes[cages[x, y]];
+                running = new int[NumCages];
+                for (int i = 0; i < NumCages; ++i)
+                    running[i] = totals[i];
             }
         }
 
@@ -57,6 +70,7 @@ namespace Sudoku
         public HintSelections HintAutoSolve { get { return hintOptions.AutoSolve; } set { hintOptions.AutoSolve = value; } }
 
         public int NumDiagonals { get { return diagonals; } }
+        public int NumCages { get { return cageInfo == null ? 0 : cageInfo.NumCages; } }
 
         public static void ReplaceListener(UpdateListener listener, SudokuGrid value, ref SudokuGrid grid)
         {
@@ -86,6 +100,8 @@ namespace Sudoku
 
         public int CageAt(int x, int y)
         {
+            if (cageInfo == null)
+                return -1;
             return cageInfo.cages[x, y];
         }
 
@@ -205,7 +221,7 @@ namespace Sudoku
             // Cage totals
             if (IsKiller)
             {
-                Point?[] cage_indicators = new Point?[cageInfo.totals.Length];
+                Point?[] cage_indicators = new Point?[NumCages];
                 for (int y = 8; y >= 0; --y)
                     for (int x = 8; x >= 0; --x)
                         if(flags[x, y] == CellFlags.Free)
@@ -214,7 +230,7 @@ namespace Sudoku
                 using (Pen inner = new Pen(Color.White, 5.0f))
                     PaintCages(context, inner);
 
-                for (int i = 0; i < cageInfo.totals.Length; ++i)
+                for (int i = 0; i < NumCages; ++i)
                     if(cage_indicators[i]!=null)
                         context.DrawTotal(Brushes.Black,
                             cage_indicators[i].Value.X, cage_indicators[i].Value.Y, cageInfo.totals[i].ToString());
@@ -425,6 +441,8 @@ namespace Sudoku
 
         public void ResetSolver()
         {
+            if (cageInfo != null)
+                cageInfo.Reset();
             for(int x=0;x<9;x++)
                 for(int y=0;y<9;y++)
                     if (FlagAt(x, y) == CellFlags.Solved)
@@ -789,14 +807,15 @@ namespace Sudoku
                     if (this_cage == names.Count - 1)
                     {
                         int grand = 0;
-                        for (int j = 0; j < cageInfo.totals.Length; ++j)
+                        for (int j = 0; j < NumCages; ++j)
                             grand += cageInfo.totals[j];
                         if (grand != 81 * 5)
                             return false;
 
                         ColourSolver cs = new ColourSolver();
-                        colours = cs.Solve(this, cageInfo.cages, cageInfo.totals.Length);
+                        colours = cs.Solve(this, cageInfo.cages, NumCages);
 
+                        cageInfo.Reset();
                         ResetSolver();
                         return true;
                     }

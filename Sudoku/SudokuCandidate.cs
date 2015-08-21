@@ -9,14 +9,34 @@ namespace Sudoku
 {
     public class SudokuCandidate : Candidate
     {
-        public int x, y, n, b;
+        CageOptional cageOptional;
+        public int x, y, n, b, c;
 
-        public SudokuCandidate(int x, int y, int n, int b)
+        public SudokuCandidate(int x, int y, int n, int b, int c)
         {
             this.x = x;
             this.y = y;
             this.n = n;
             this.b = b;
+            this.c = c;
+        }
+
+        public void AddCageOptional(CageOptional c)
+        {
+            this.cageOptional = c;
+            AddCandidate(c);
+        }
+
+        public override void OnCover(ExactCover ec)
+        {
+            if (cageOptional != null)
+                cageOptional.OnCover(ec, this);
+        }
+
+        public override void OnUncover(ExactCover ec)
+        {
+            if (cageOptional != null)
+                cageOptional.OnUncover(ec, this);
         }
 
         public override string ToString()

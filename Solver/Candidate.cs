@@ -45,6 +45,9 @@ namespace Solver
         public virtual void PaintForeground(HintPainter context, Brush br) { }
         public virtual void PaintBackground(HintPainter context, Brush br) { }
 
+        public virtual void OnCover(ExactCover ec) { }
+        public virtual void OnUncover(ExactCover ec) { }
+
         public Tile Tile { get { return tile; } }
     }
 }

@@ -12,6 +12,7 @@ namespace Sudoku
         private int solnsFound;
         private Candidate[] sampleSoln;
         protected SudokuRequirement[] ca;
+        protected CageOptional[] co;
 
         public SudokuSolver(SudokuGrid grid)
         {
@@ -27,6 +28,13 @@ namespace Sudoku
             ca = new SudokuRequirement[nc];
             for (int i = 0; i < ca.Length; ++i)
                 ca[i] = new SudokuRequirement();
+        }
+
+        protected void CreateOptionals(SudokuGrid grid, int nc)
+        {
+            co = new CageOptional[nc];
+            for (int i = 0; i < co.Length; ++i)
+                co[i] = new CageOptional(grid.cageInfo);
         }
 
         public SolveResult DoLogicalSolve(SudokuGrid grid, HintSelections hs)
@@ -88,6 +96,11 @@ namespace Sudoku
             return ca[ 9 * 9 * 4 + 9 + n];
         }
 
+        CageOptional GetCageOptional(int n, int cage)
+        {
+            return co[n + cage * 9];
+        }
+
         /*
         public SudokuSolver(string[] lines)
         {
@@ -99,7 +112,9 @@ namespace Sudoku
         void CreateMatrix(SudokuGrid grid)
         {
             // Create requirements - columns of 0/1 matrix
+            int num_cages = grid.NumCages;
             CreateRequirements(9 * 9 * 4 + grid.NumDiagonals * 9);
+            CreateOptionals(grid, 9 * num_cages);
             Houses[] houses = new Houses[]{
                 Houses.Cell,
                 Houses.Column,
@@ -150,18 +165,21 @@ namespace Sudoku
             {
                 for (int y = 0; y < 9; ++y)
                 {
-                    int b = grid.BoxAt(x, y);
+                    int cage = grid.CageAt(x, y);
+                    int box = grid.BoxAt(x, y);
                     for (int n = 0; n < 9; ++n)
                     {
-                        SudokuCandidate k = new SudokuCandidate(x, y, n, b);
+                        SudokuCandidate k = new SudokuCandidate(x, y, n, box, cage);
                         k.AddCandidate(GetRequirement(x, y, Houses.Cell));
                         k.AddCandidate(GetRequirement(x, n, Houses.Column));
                         k.AddCandidate(GetRequirement(y, n, Houses.Row));
-                        k.AddCandidate(GetRequirement(b, n, Houses.Box));
+                        k.AddCandidate(GetRequirement(box, n, Houses.Box));
                         if (grid.NumDiagonals > 0 && x == y)
                             k.AddCandidate(GetMajorDiagonalRequirement(n));
                         if (grid.NumDiagonals > 1 && x == 8 - y)
                             k.AddCandidate(GetMinorDiagonalRequirement(n));
+                        if (cage != -1)
+                            k.AddCageOptional(GetCageOptional(n, cage));
                         tr[trc++] = k;
                     }
                 }
