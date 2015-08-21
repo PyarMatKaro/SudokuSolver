@@ -769,6 +769,11 @@ namespace Sudoku
                     cageInfo.totals[this_cage] = tot;
                     if (this_cage == names.Count - 1)
                     {
+                        int grand = 0;
+                        for (int j = 0; j < cageInfo.totals.Length; ++j)
+                            grand += cageInfo.totals[j];
+                        if (grand != 81 * 5)
+                            return false;
                         cageInfo.Colour(this);
                         ResetSolver();
                         return true;
