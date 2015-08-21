@@ -8,8 +8,9 @@ namespace Sudoku
 {
     public class ColourSolver : ExactCover
     {
-        SudokuGrid.CageInfo cageInfo;
         Dictionary<int, List<int>> nb;
+        int[] colourOfCage;
+        bool haveSolution;
 
         int findNeighbour(int ca1, int ca2)
         {
@@ -21,12 +22,9 @@ namespace Sudoku
             return -1;
         }
 
-        public void Solve(SudokuGrid.CageInfo info, SudokuGrid grid)
+        public int[,] Solve(SudokuGrid grid, int[,] cages, int numCages)
         {
-            this.cageInfo = info;
-            int numCages = info.totals.Length;
-            info.colours = new int[numCages];
-
+            colourOfCage = new int[numCages];
             nb = new Dictionary<int, List<int>>();
             for (int ca = 0; ca < numCages; ++ca)
                 nb[ca] = new List<int>();
@@ -42,8 +40,8 @@ namespace Sudoku
                         int y1 = y + dy[d];
                         if (x1 >= 0 && x1 < 9 && y1 >= 0 && y1 < 9)
                         {
-                            int c1 = info.cages[x, y];
-                            int c2 = info.cages[x1, y1];
+                            int c1 = cages[x, y];
+                            int c2 = cages[x1, y1];
                             if (c1 != c2)
                             {
                                 List<int> ns = nb[c1];
@@ -98,6 +96,14 @@ namespace Sudoku
 
             CreateSolution(numCages + numBorders/2);
             BacktrackingSearch();
+
+            if(!haveSolution)
+                return null;
+            int[,] ret = new int[9,9];
+            for (int x = 0; x < 9; x++)
+                for (int y = 0; y < 9; y++)
+                    ret[x, y] = colourOfCage[cages[x, y]];
+            return ret;
         }
 
         public override bool OnSolution()
@@ -106,9 +112,10 @@ namespace Sudoku
                 if (c is BorderCandidate)
                 {
                     BorderCandidate bc = c as BorderCandidate;
-                    cageInfo.colours[bc.ca1] = bc.co1;
-                    cageInfo.colours[bc.ca2] = bc.co2;
+                    colourOfCage[bc.ca1] = bc.co1;
+                    colourOfCage[bc.ca2] = bc.co2;
                 }
+            haveSolution = true;
             return true;
         }
     }

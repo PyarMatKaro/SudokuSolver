@@ -21,7 +21,7 @@ namespace Sudoku
 
         bool requestedHint;
         List<UpdateListener> listeners = new List<UpdateListener>();
-        int[,] values, boxes;
+        int[,] values, boxes, colours;
         SudokuSolver solver;
         bool diagonal;
         HintOptions hintOptions = new HintOptions();
@@ -30,17 +30,11 @@ namespace Sudoku
         public class CageInfo
         {
             public int[,] cages;
-            public int[] totals, colours;
+            public int[] totals;
 
             public CageInfo()
             {
                 cages = new int[9, 9];
-            }
-
-            public void Colour(SudokuGrid grid)
-            {
-                ColourSolver cs = new ColourSolver();
-                cs.Solve(this, grid);
             }
         }
 
@@ -109,6 +103,7 @@ namespace Sudoku
         public void ClearGrid(bool diagonal)
         {
             this.cageInfo = null;
+            this.colours = null;
             this.diagonal = diagonal;
             values = new int[9, 9];
             flags = new CellFlags[9, 9];
@@ -191,21 +186,27 @@ namespace Sudoku
                 }
             }
 
-            // Cages
-            if (IsKiller)
+            // Coloured cages or boxes
+            if (colours != null)
             {
-                Color[] colours = new Color[]{
+                Color[] cage_colours = new Color[]{
                     Color.FromArgb(255,253,152),
                     Color.FromArgb(207,231,153),
                     Color.FromArgb(203,232,250),
                     Color.FromArgb(248,207,223)};
                 Brush[] cage_brushes = new Brush[4];
                 for (int i = 0; i < 4; ++i)
-                    cage_brushes[i] = new SolidBrush(colours[i]);
+                    cage_brushes[i] = new SolidBrush(cage_colours[i]);
                 for (int x = 0; x < 9; ++x)
                     for (int y = 0; y < 9; ++y)
-                        context.FillCell(x, y, cage_brushes[cageInfo.colours[CageAt(x, y)]]);
+                        context.FillCell(x, y, cage_brushes[colours[x, y]]);
+                for (int i = 0; i < 4; ++i)
+                    cage_brushes[i].Dispose();
+            }
 
+            // Cage totals
+            if (IsKiller)
+            {
                 Point?[] cage_indicators = new Point?[cageInfo.totals.Length];
                 for (int y = 8; y >= 0; --y)
                     for (int x = 8; x >= 0; --x)
@@ -217,8 +218,6 @@ namespace Sudoku
                     if(cage_indicators[i]!=null)
                         context.DrawTotal(Brushes.Black,
                             cage_indicators[i].Value.X, cage_indicators[i].Value.Y, cageInfo.totals[i].ToString());
-                for (int i = 0; i < 4; ++i)
-                    cage_brushes[i].Dispose();
             }
 
             foreach (Hint hint in paintedHints)
@@ -774,7 +773,10 @@ namespace Sudoku
                             grand += cageInfo.totals[j];
                         if (grand != 81 * 5)
                             return false;
-                        cageInfo.Colour(this);
+
+                        ColourSolver cs = new ColourSolver();
+                        colours = cs.Solve(this, cageInfo.cages, cageInfo.totals.Length);
+
                         ResetSolver();
                         return true;
                     }
@@ -835,6 +837,9 @@ namespace Sudoku
                     }
                     boxes[x, y] = b - 'a';
                 }
+
+            ColourSolver cs = new ColourSolver();
+            colours = cs.Solve(this, boxes, 9);
             ResetSolver();
             return true;
         }
