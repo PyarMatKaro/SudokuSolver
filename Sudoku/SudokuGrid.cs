@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using Solver;
+using System.Drawing.Drawing2D;
 
 namespace Sudoku
 {
@@ -22,7 +23,7 @@ namespace Sudoku
         List<UpdateListener> listeners = new List<UpdateListener>();
         int[,] values, boxes, colours;
         SudokuSolver solver;
-        bool diagonal;
+        int diagonals;
         HintOptions hintOptions = new HintOptions();
         Hint[] paintedHints = new Hint[0];
 
@@ -39,9 +40,9 @@ namespace Sudoku
 
         public CageInfo cageInfo;
 
-        public SudokuGrid(bool diagonal)
+        public SudokuGrid(int diagonals)
         {
-            ClearGrid(diagonal);
+            ClearGrid(diagonals);
         }
 
         public void RequestHint()
@@ -55,7 +56,7 @@ namespace Sudoku
         public HintSelections HintShow { get { return hintOptions.Show; } set { hintOptions.Show = value; } }
         public HintSelections HintAutoSolve { get { return hintOptions.AutoSolve; } set { hintOptions.AutoSolve = value; } }
 
-        public bool HasDiagonals { get { return diagonal; } }
+        public int NumDiagonals { get { return diagonals; } }
 
         public static void ReplaceListener(UpdateListener listener, SudokuGrid value, ref SudokuGrid grid)
         {
@@ -70,7 +71,7 @@ namespace Sudoku
 
         public void ClearGrid()
         {
-            ClearGrid(diagonal);
+            ClearGrid(diagonals);
         }
 
         public static int DefaultBoxAt(int x, int y)
@@ -98,11 +99,11 @@ namespace Sudoku
             return values[x, y];
         }
 
-        public void ClearGrid(bool diagonal)
+        public void ClearGrid(int diagonals)
         {
             this.cageInfo = null;
             this.colours = null;
-            this.diagonal = diagonal;
+            this.diagonals = diagonals;
             values = new int[9, 9];
             flags = new CellFlags[9, 9];
             boxes = new int[9, 9];
@@ -173,17 +174,6 @@ namespace Sudoku
                 ? Brushes.LightGreen : Brushes.White;
             context.FillBackground(back);
 
-            // Diagonals
-            if (diagonal)
-            {
-                for (int x = 0; x < 9; ++x)
-                {
-                    context.FillCell(x, x, Brushes.LightGray);
-                    if (x != 8 - x)
-                        context.FillCell(x, 8 - x, Brushes.LightGray);
-                }
-            }
-
             // Coloured cages or boxes
             if (colours != null)
             {
@@ -202,6 +192,16 @@ namespace Sudoku
                     cage_brushes[i].Dispose();
             }
 
+            // Diagonals - brush  previously Brushes.LightGray
+            if (NumDiagonals > 0)
+                using (Brush br = new HatchBrush(HatchStyle.ForwardDiagonal, Color.DarkGray, Color.Transparent))
+                    for (int x = 0; x < 9; ++x)
+                        context.FillCell(x, x, br);
+            if (NumDiagonals > 1)
+                using (Brush br = new HatchBrush(HatchStyle.BackwardDiagonal, Color.DarkGray, Color.Transparent))
+                    for (int x = 0; x < 9; ++x)
+                        context.FillCell(x, 8 - x, br);
+
             // Cage totals
             if (IsKiller)
             {
@@ -210,8 +210,10 @@ namespace Sudoku
                     for (int x = 8; x >= 0; --x)
                         if(flags[x, y] == CellFlags.Free)
                             cage_indicators[cageInfo.cages[x, y]] = new Point(x, y);
-                //using (Pen inner = new Pen(Color.White, 5.0f))
-                //    PaintCages(context, inner);
+
+                using (Pen inner = new Pen(Color.White, 5.0f))
+                    PaintCages(context, inner);
+
                 for (int i = 0; i < cageInfo.totals.Length; ++i)
                     if(cage_indicators[i]!=null)
                         context.DrawTotal(Brushes.Black,
@@ -536,7 +538,11 @@ namespace Sudoku
                 char lc = 'a';
                 List<string> lg = new List<string>();
                 List<string> lq = new List<string>();
-                string lcl="";
+                if (diagonals == 1)
+                    lg.Add("DIAGONAL");
+                else if (diagonals == 2)
+                    lg.Add("DIAGONALS");
+                string lcl = "";
                 for (int y = 0; y < 9; ++y)
                 {
                     string gs = "";
@@ -580,7 +586,9 @@ namespace Sudoku
             get
             {
                 List<string> l = new List<string>();
-                if (diagonal)
+                if (diagonals == 1)
+                    l.Add("DIAGONAL");
+                else if (diagonals == 2)
                     l.Add("DIAGONALS");
                 for (int y = 0; y < 9; ++y)
                 {
@@ -604,7 +612,9 @@ namespace Sudoku
             get
             {
                 List<string> l = new List<string>();
-                if (diagonal)
+                if (diagonals == 1)
+                    l.Add("DIAGONAL");
+                else if (diagonals == 2)
                     l.Add("DIAGONALS");
                 for (int y = 0; y < 9; ++y)
                 {
@@ -654,7 +664,7 @@ namespace Sudoku
                 string s = a[i];
                 if (s.Length == 81)
                 {
-                    ClearGrid(false);
+                    ClearGrid(0);
                     for (int y = 0; y < 9; ++y)
                         for (int x = 0; x < 9; ++x)
                         {
@@ -674,12 +684,14 @@ namespace Sudoku
 
         public bool SetGridStrings9x9(string[] a)
         {
-            bool diags = false;
+            int diags = 0;
             List<string> l = new List<string>();
             for (int y = 0; y < a.Length; ++y)
             {
-                if (a[y].ToUpper().StartsWith("D"))
-                    diags = true;
+                if (a[y].ToUpper() == "DIAGONAL")
+                    diags = 1;
+                else if (a[y].ToUpper() == "DIAGONALS")
+                    diags = 2;
                 else
                 {
                     string s = "";
@@ -715,7 +727,18 @@ namespace Sudoku
         {
             List<string> l = new List<string>();
             int y = 0, i=0;
-            ClearGrid(false);
+            int diags = 0;
+            if (a[i].ToUpper() == "DIAGONAL")
+            {
+                diags = 1;
+                i++;
+            }
+            else if (a[i].ToUpper() == "DIAGONALS")
+            {
+                diags = 2;
+                i++;
+            }
+            ClearGrid(diags);
             cageInfo = new CageInfo();
             Dictionary<char, int> names = new Dictionary<char, int>();
             for (int j = 0; j < 9; ++j)
@@ -784,12 +807,14 @@ namespace Sudoku
 
         public bool SetGridStrings9x9Jigsaw(string[] a)
         {
-            bool diags = false;
+            int diags = 0;
             List<string> l = new List<string>();
             for (int y = 0; y < a.Length; ++y)
             {
-                if (a[y].ToUpper().StartsWith("DIAG"))
-                    diags = true;
+                if (a[y].ToUpper() == "DIAGONAL")
+                    diags = 1;
+                else if (a[y].ToUpper() == "DIAGONALS")
+                    diags = 2;
                 else
                 {
                     string s = "";
@@ -816,7 +841,7 @@ namespace Sudoku
             a = l.ToArray();
             if (a.Length != 9)
                 return false;
-            diagonal = diags;
+            diagonals = diags;
             for (int y = 0; y < 9; ++y)
                 for (int x = 0; x < 9; ++x)
                 {

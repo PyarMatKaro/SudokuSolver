@@ -34,7 +34,7 @@ namespace Sudoku
             Application.Run(ac);
              */
 
-            SudokuForm form = new SudokuForm(new SudokuGrid(false));
+            SudokuForm form = new SudokuForm(new SudokuGrid(0));
             Application.Run(form);
         }
     }

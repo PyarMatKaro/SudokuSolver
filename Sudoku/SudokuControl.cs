@@ -38,7 +38,7 @@ namespace Sudoku
 
                 // Keep form designer happy
                 if (grid == null)
-                    grid = new SudokuGrid(false);
+                    grid = new SudokuGrid(0);
 
                 using (PaintContext context = new PaintContext(e.Graphics, Size, grid, selx, sely))
                 {

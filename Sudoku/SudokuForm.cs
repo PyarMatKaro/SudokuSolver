@@ -106,13 +106,19 @@ namespace Sudoku
 
         private void newGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.ClearGrid(false);
+            Grid.ClearGrid(0);
             Grid.ResetSolver();
         }
 
-        private void newDiagonalGridToolStripMenuItem_Click(object sender, EventArgs e)
+        private void new1DiagonalGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.ClearGrid(true);
+            Grid.ClearGrid(1);
+            Grid.ResetSolver();
+        }
+
+        private void new2DiagonalsGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Grid.ClearGrid(2);
             Grid.ResetSolver();
         }
 

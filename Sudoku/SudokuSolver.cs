@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Solver;
+using System.Drawing;
 
 namespace Sudoku
 {
@@ -97,9 +98,8 @@ namespace Sudoku
 
         void CreateMatrix(SudokuGrid grid)
         {
-            bool diagonal = grid.HasDiagonals;
             // Create requirements - columns of 0/1 matrix
-            CreateRequirements(9 * 9 * 4 + 2 * 9);
+            CreateRequirements(9 * 9 * 4 + grid.NumDiagonals * 9);
             Houses[] houses = new Houses[]{
                 Houses.Cell,
                 Houses.Column,
@@ -120,7 +120,7 @@ namespace Sudoku
                     }
                 }
             }
-            if (diagonal)
+            if (grid.NumDiagonals > 0)
             {
                 for (int i0 = 0; i0 < 9; ++i0)
                 {
@@ -129,8 +129,13 @@ namespace Sudoku
                     c.i1 = -1;
                     c.house = Houses.MajorDiagonal;
                     requirements.AddRequirement(c);
-
-                    c = GetMinorDiagonalRequirement(i0);
+                }
+            }
+            if (grid.NumDiagonals > 1)
+            {
+                for (int i0 = 0; i0 < 9; ++i0)
+                {
+                    SudokuRequirement c = GetMinorDiagonalRequirement(i0);
                     c.i0 = i0;
                     c.i1 = -1;
                     c.house = Houses.MinorDiagonal;
@@ -153,18 +158,41 @@ namespace Sudoku
                         k.AddCandidate(GetRequirement(x, n, Houses.Column));
                         k.AddCandidate(GetRequirement(y, n, Houses.Row));
                         k.AddCandidate(GetRequirement(b, n, Houses.Box));
-                        if (diagonal)
-                        {
-                            if (x == y)
-                                k.AddCandidate(GetMajorDiagonalRequirement(n));
-                            if (x == 8 - y)
-                                k.AddCandidate(GetMinorDiagonalRequirement(n));
-                        }
+                        if (grid.NumDiagonals > 0 && x == y)
+                            k.AddCandidate(GetMajorDiagonalRequirement(n));
+                        if (grid.NumDiagonals > 1 && x == 8 - y)
+                            k.AddCandidate(GetMinorDiagonalRequirement(n));
                         tr[trc++] = k;
                     }
                 }
             }
+
+            /*
+            if (grid.IsKiller)
+            {
+                SudokuGrid.CageInfo info = grid.cageInfo;
+                for (int ca = 0; ca < info.cages.Length; ++ca)
+                {
+                    List<Point> pts = new List<Point>();
+                    for (int x = 0; x < 9; ++x)
+                        for (int y = 0; y < 8; ++y)
+                            if (info.cages[x, y] == ca)
+                                pts.Add(new Point(x, y));
+                    int[] ns = new int[9];
+                    for (int i = 0; i < 9; ++i) ns[i] = i;
+                    Candidate k = new Candidate();
+                    KillerRequire(k, info.totals[ca], pts.ToArray(), ns);
+                }
+            }
+            */
         }
+
+        /*
+        void KillerRequire(Candidate k, int tot, Point[] pts, int[] ns)
+        {
+            Candidate k1 = new Candidate();
+        }
+        */
 
         public Candidate GetCandidate(int x, int y, int n)
         {
