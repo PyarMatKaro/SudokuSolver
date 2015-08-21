@@ -96,7 +96,7 @@ namespace Sudoku
             return ca[ 9 * 9 * 4 + 9 + n];
         }
 
-        CageOptional GetCageOptional(int n, int cage)
+        public CageOptional GetCageOptional(int n, int cage)
         {
             return co[n + cage * 9];
         }
@@ -181,6 +181,10 @@ namespace Sudoku
                         if (cage != -1)
                             k.AddCageOptional(GetCageOptional(n, cage));
                         tr[trc++] = k;
+
+                        // Discard candidates where cage size already reached 1
+                        //if (cage != -1 && grid.cageInfo.sizes[cage] == 1 && n + 1 != grid.cageInfo.totals[cage])
+                        //    DiscardCandidate(k);
                     }
                 }
             }
