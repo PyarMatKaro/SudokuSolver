@@ -1,10 +1,8 @@
 ﻿To Do
 
-Generic parameters
- Tiles should be added to candidates
- Solution should be an array of candidates
- Tiles in row have candidates
- CheckSelectCandidate etc
+Bugs with solving Killer:
+ With "show hints" off, load Killer1, solve with backtracking twice, first time fails, second time works
+ Shows running total as 0 with backtracking solution
 
 Design problem - the grid HAS a solver which doubles as pencil mark manager, the controller should USE a solver
 
@@ -13,9 +11,6 @@ Use improvements to solver in other projects
 Instrument solver performance, and variants such as casting out impossibles
 
 Try using contradiction hints on removing a row
-
-Killer, others
-Killer requires modifications to the solver
 
 Show contradiction hints with black pencil marks even when they are disabled, as well as the red pencil marks?
 
