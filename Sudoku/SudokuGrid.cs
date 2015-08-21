@@ -19,7 +19,6 @@ namespace Sudoku
         public enum PlayModes { Edit, Play, Pencil };
         public PlayModes PlayMode;
 
-        bool requestedHint;
         List<UpdateListener> listeners = new List<UpdateListener>();
         int[,] values, boxes, colours;
         SudokuSolver solver;
@@ -47,8 +46,7 @@ namespace Sudoku
 
         public void RequestHint()
         {
-            requestedHint = true;
-            UpdatePaintedHints();
+            UpdatePaintedHints(true);
         }
 
         public Hint[] PaintedHints { get { return paintedHints; } }
@@ -278,7 +276,7 @@ namespace Sudoku
                 hint.PaintForeground(context);
         }
 
-        void UpdatePaintedHints()
+        void UpdatePaintedHints(bool requestedHint)
         {
             if (PlayMode == PlayModes.Edit)
             {
@@ -299,7 +297,6 @@ namespace Sudoku
             {
                 paintedHints = new Hint[0];
             }
-            requestedHint = false;
         }
 
         public ForcedMoveHint SingleForcedHint { get { return solver.SingleForcedHint; } }
@@ -440,7 +437,7 @@ namespace Sudoku
         public void Updated()
         {
             FireChanged();
-            UpdatePaintedHints();
+            UpdatePaintedHints(false);
         }
 
         public void SolveLogically()

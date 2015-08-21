@@ -96,23 +96,29 @@ namespace Sudoku
             Invalidate();
         }
 
+        bool SelectForcedHint()
+        {
+            ForcedMoveHint hint = null;
+            if (Grid.HintFlags.SelectForcedMoveHints &&
+                Grid.PaintedHints.Length > 0 &&
+                Grid.PaintedHints[0] is ForcedMoveHint)
+                hint = Grid.PaintedHints[0] as ForcedMoveHint;
+            if (hint != null)
+            {
+                SudokuCandidate sc = (SudokuCandidate)hint.Candidate;
+                selx = sc.x;
+                sely = sc.y;
+                return true;
+            }
+            return false;
+        }
+
         void HandleNumber(int n)
         {
             int x = selx, y = sely;
             if (HasSelection && Grid.SetCell(x, y, n))
             {
-                ForcedMoveHint hint = null;
-                if (Grid.HintFlags.SelectForcedMoveHints &&
-                    Grid.PaintedHints.Length > 0 &&
-                    Grid.PaintedHints[0] is ForcedMoveHint)
-                    hint = Grid.PaintedHints[0] as ForcedMoveHint;
-                if (hint != null)
-                {
-                    SudokuCandidate sc = (SudokuCandidate)hint.Candidate;
-                    selx = sc.x;
-                    sely = sc.y;
-                }
-                else if (grid.PlayMode != SudokuGrid.PlayModes.Pencil)
+                if (!SelectForcedHint() && grid.PlayMode != SudokuGrid.PlayModes.Pencil)
                     AdvanceSelection();
             }
             else
@@ -171,6 +177,7 @@ namespace Sudoku
 
                 case Keys.H:
                     Grid.RequestHint();
+                    SelectForcedHint();
                     Invalidate();
                     break;
 
