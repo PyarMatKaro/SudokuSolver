@@ -45,7 +45,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Name = "SudokuControl";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.SudokuControl_Paint);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SudokuControl_KeyPress);
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.SudokuControl_MouseClick);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.SudokuControl_MouseMove);
             this.Resize += new System.EventHandler(this.SudokuControl_Resize);
