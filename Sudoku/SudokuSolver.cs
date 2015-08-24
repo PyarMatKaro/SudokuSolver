@@ -52,7 +52,7 @@ namespace Sudoku
             }
         }
 
-        public SolveResult DoBacktrackingSolve()
+        public SolveResult DoBacktrackingSolve(SudokuGrid grid)
         {
             //verbose = false;
             solnsFound = 0;
@@ -63,7 +63,7 @@ namespace Sudoku
             if (solnsFound == 1)
             {
                 for (int i = osc; i < sampleSoln.Length; ++i)
-                    SelectCandidate(sampleSoln[i]);
+                    grid.SelectCandidate(sampleSoln[i]);
                 return SolveResult.SingleSolution;
             }
             return SolveResult.MultipleSolutions;

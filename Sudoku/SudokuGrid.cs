@@ -489,7 +489,7 @@ namespace Sudoku
 
         public void SolveBacktracking()
         {
-            SolveResult solns = solver.DoBacktrackingSolve();
+            SolveResult solns = solver.DoBacktrackingSolve(this);
             ShowSolveResult(solns);
         }
 
@@ -556,15 +556,14 @@ namespace Sudoku
             {
                 Dictionary<int, char> d = new Dictionary<int, char>();
                 char lc = 'a';
-                List<string> lg = new List<string>();
-                List<string> lq = new List<string>();
+                List<string> ret = new List<string>();
                 if (diagonals == 1)
-                    lg.Add("DIAGONAL");
+                    ret.Add("DIAGONAL");
                 else if (diagonals == 2)
-                    lg.Add("DIAGONALS");
-                string lcl = "";
+                    ret.Add("DIAGONALS");
                 for (int y = 0; y < 9; ++y)
                 {
+                    string lcl = "";
                     string gs = "";
                     for (int x = 0; x < 9; ++x)
                     {
@@ -585,23 +584,13 @@ namespace Sudoku
                                 ++lc;
                             d[ca] = c;
                             string cs = c.ToString() + "=" + cageInfo.totals[ca];
-                            if (lcl.Length == 0)
-                                lcl = cs;
-                            else if (lcl.Length < 40)
-                                lcl += " " + cs;
-                            else
-                            {
-                                lq.Add(lcl);
-                                lcl = cs;
-                            }
+                            lcl += " " + cs;
                         }
                         gs += c;
                     }
-                    lg.Add(gs);
+                    ret.Add(gs + lcl);
                 }
-                lg.AddRange(lq);
-                lg.Add(lcl);
-                return lg.ToArray();
+                return ret.ToArray();
             }
         }
 
@@ -747,33 +736,44 @@ namespace Sudoku
             return true;
         }
 
-        public bool SetGridStrings9x9Killer(string[] a)
+        public bool SetGridStrings9x9Killer(string[] a0)
         {
             List<string> l = new List<string>();
-            int y = 0, i=0;
+            int i=0;
             int diags = 0;
-            if (a[i].ToUpper() == "DIAGONAL")
+            if (a0[i].ToUpper() == "DIAGONAL")
             {
                 diags = 1;
                 i++;
             }
-            else if (a[i].ToUpper() == "DIAGONALS")
+            else if (a0[i].ToUpper() == "DIAGONALS")
             {
                 diags = 2;
                 i++;
             }
             ClearGrid(diags);
+            List<string> aLine = new List<string>();
+            List<string> aSum = new List<string>();
+            for (; i < a0.Length; ++i)
+            {
+                string[] a = a0[i].Split(' ');
+                foreach (string s in a)
+                    if (s.Length == 9)
+                        aLine.Add(s);
+                    else if (s.Length > 2 && s[1] == '=')
+                        aSum.Add(s);
+                    else if (s.Length > 0)
+                        return false;
+            }
+            if (aLine.Count != 9)
+                return false;
             cageInfo = new CageInfo();
             Dictionary<char, int> names = new Dictionary<char, int>();
             Dictionary<int, int> totals = new Dictionary<int, int>();
             int num_cages = 0;
-            for (int j = 0; j < 9; ++j)
+            for (int y = 0; y < 9; ++y)
             {
-                if (i >= a.Length)
-                    return false;
-                string s = a[i].Replace(" ", "");
-                if (s.Length != 9)
-                    return false;
+                string s = aLine[y];
                 for (int x = 0; x < 9; ++x)
                 {
                     int this_cage;
@@ -793,64 +793,49 @@ namespace Sudoku
                     cageInfo.cages[x, y] = this_cage;
                     boxes[x, y] = DefaultBoxAt(x, y);
                 }
-                y++;
-                i++;
             }
             cageInfo.totals = new int[num_cages];
-            while (true)
+            foreach(string s in aSum)
             {
-                if (i >= a.Length)
+                int tot;
+                if(!int.TryParse(s.Substring(2), out tot))
                     return false;
-                string[] b = a[i].Split(' ');
-                foreach (string e in b)
-                    if (!e.Contains("="))
-                        return false;
-                foreach (string e in b)
+                char c = s[0];
+                int this_cage;
+                if (!names.TryGetValue(c, out this_cage))
+                    return false;
+                totals[this_cage] = tot;
+            }
+
+            if (totals.Count != num_cages)
+                return false;
+            cageInfo.totals = new int[num_cages];
+            int grand = 0;
+            for (int j = 0; j < NumCages; ++j)
+            {
+                cageInfo.totals[j] = totals[j];
+                grand += cageInfo.totals[j];
+            }
+            if (grand != 81 * 5)
+                return false;
+
+            ColourSolver cs = new ColourSolver();
+            colours = cs.Solve(this, cageInfo.cages, NumCages);
+
+            cageInfo.Reset();
+            for (int y = 0; y < 9; ++y)
+                for (int x = 0; x < 9; ++x)
                 {
-                    string[] es = e.Split('=');
-                    if (es.Length != 2 || es[0].Length != 1)
-                        return false;
-                    int tot;
-                    if(!int.TryParse(es[1], out tot))
-                        return false;
-                    char c = es[0][0];
-                    int this_cage;
-                    if (!names.TryGetValue(c, out this_cage))
-                        return false;
-                    totals[this_cage] = tot;
-                    if(totals.Count == num_cages)
+                    int cage = cageInfo.cages[x, y];
+                    if (cageInfo.sizes[cage] == 1)
                     {
-                        cageInfo.totals = new int[num_cages];
-                        int grand = 0;
-                        for (int j = 0; j < NumCages; ++j)
-                        {
-                            cageInfo.totals[j] = totals[j];
-                            grand += cageInfo.totals[j];
-                        }
-                        if (grand != 81 * 5)
-                            return false;
-
-                        ColourSolver cs = new ColourSolver();
-                        colours = cs.Solve(this, cageInfo.cages, NumCages);
-
-                        cageInfo.Reset();
-                        for (int x = 0; x < 9; ++x)
-                            for (int y1 = 0; y1 < 9; ++y1)
-                            {
-                                int cage = cageInfo.cages[x, y1];
-                                if (cageInfo.sizes[cage] == 1)
-                                {
-                                    values[x, y1] = cageInfo.totals[cage] - 1;
-                                    flags[x, y1] = CellFlags.Fixed;
-                                }
-                            }
-
-                        ResetSolver();
-                        return true;
+                        values[x, y] = cageInfo.totals[cage] - 1;
+                        flags[x, y] = CellFlags.Fixed;
                     }
                 }
-                i++;
-            }
+
+            ResetSolver();
+            return true;
         }
 
         public bool SetGridStrings9x9Jigsaw(string[] a)
