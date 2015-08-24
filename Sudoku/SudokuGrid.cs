@@ -287,16 +287,13 @@ namespace Sudoku
 
             // Unknowns as pencil marks
             if (HintFlags.PaintPencilMarks)
-            {
-                foreach (Candidate k in solver.UnselectedCandidates)
-                {
-                    SudokuCandidate sc = (SudokuCandidate)k;
-                    context.DrawSubcell(Brushes.Black, sc.x, sc.y, sc.n);
-                }
-            }
+                foreach (SudokuCandidate k in solver.UnselectedCandidates)
+                    context.SetPencil(k, Hint.Kind.Maybe);
 
             foreach (Hint hint in paintedHints)
                 hint.PaintForeground(context);
+
+            context.PaintPencilMarksAndHints();
         }
 
         void UpdatePaintedHints(bool requestedHint)

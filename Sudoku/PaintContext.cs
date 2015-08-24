@@ -14,6 +14,8 @@ namespace Sudoku
         public readonly Font SmallFont, LargeFont;
         public readonly int selx, sely;
 
+        public Dictionary<Point, Dictionary<int, Hint.Kind>> pencil = new Dictionary<Point, Dictionary<int, Hint.Kind>>();
+
         public PaintContext(Graphics graphics, Size size, SudokuGrid grid, int selx, int sely)
             : base(size)
         {
@@ -31,14 +33,81 @@ namespace Sudoku
             LargeFont.Dispose();
         }
 
+        public void PaintPencilMarksAndHints()
+        {
+            foreach (KeyValuePair<Point, Dictionary<int, Hint.Kind>> kvp in pencil)
+            {
+                Point p = kvp.Key;
+                Dictionary<int, Hint.Kind> d = kvp.Value;
+                int[] ln = d.Keys.ToArray();
+                Array.Sort(ln);
+                for (int i = 0; i < ln.Length; ++i)
+                {
+                    Brush br = ForegroundBrush(d[ln[i]]);
+                    DrawSubcell(br, p.X, p.Y, i + 9 - ln.Length, (ln[i] + 1).ToString());
+                }
+            }
+        }
+
+        public void SetPencil(SudokuCandidate sc, Hint.Kind v)
+        {
+            SetPencil(sc.x, sc.y, sc.n, v);
+        }
+
+        public void SetPencil(int x, int y, int n, Hint.Kind v)
+        {
+            Point p = new Point(x, y);
+            Dictionary<int, Hint.Kind> d;
+            if(!pencil.TryGetValue(p, out d))
+                pencil[p] = d = new Dictionary<int, Hint.Kind>();
+            d[n] = v;
+        }
+
+        public static Brush ForegroundBrush(Hint.Kind v)
+        {
+            switch (v)
+            {
+                default:
+                case Hint.Kind.Never:
+                    return Brushes.Red;
+                case Hint.Kind.Maybe:
+                    return Brushes.Black;
+                case Hint.Kind.Must:
+                    return Brushes.White;
+                case Hint.Kind.AmongMust:
+                    return Brushes.Green;
+            }
+        }
+
+        public static Brush BackgroundBrush(Hint.Kind v)
+        {
+            switch (v)
+            {
+                default:
+                case Hint.Kind.Never:
+                    return Brushes.Pink;
+                case Hint.Kind.Maybe:
+                    return Brushes.Black;
+                case Hint.Kind.Must:
+                    return Brushes.Green;
+                case Hint.Kind.AmongMust:
+                    return Brushes.LightGreen;
+            }
+        }
+
         public void FillBackground(Brush back)
         {
             graphics.FillRectangle(back, new Rectangle(new Point(), FullSize));
         }
 
-        public void FillCell(int x, int y, Brush back)
+        public void FillCell(int x, int y, Hint.Kind v)
         {
-            graphics.FillRectangle(back, new Rectangle(CellLocation(x, y), CellSize));
+            FillCell(x, y, BackgroundBrush(v));
+        }
+
+        public void FillCell(int x, int y, Brush br)
+        {
+            graphics.FillRectangle(br, new Rectangle(CellLocation(x, y), CellSize));
         }
 
         public void FillColumn(int x, Brush back)
@@ -72,11 +141,15 @@ namespace Sudoku
 
         public void DrawSubcell(Brush br, int x, int y, int n)
         {
+            DrawSubcell(br,x,y,n,(n+1).ToString());
+        }
+
+        public void DrawSubcell(Brush br, int x, int y, int n, string s)
+        {
             int x2 = n % 3;
             int y2 = n / 3;
             Size csz = SubcellSize;
             Point p = SubcellLocation(x * 3 + x2, y * 3 + y2);
-            string s = (n + 1).ToString();
             SizeF sz = graphics.MeasureString(s, SmallFont);
             graphics.DrawString(s, SmallFont, br, p.X + (csz.Width - sz.Width) / 2, p.Y + (csz.Height - sz.Height) / 2);
         }

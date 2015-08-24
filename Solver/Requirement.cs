@@ -93,8 +93,8 @@ namespace Solver
             }
         }
 
-        public virtual void PaintForeground(HintPainter context, Brush br) { }
-        public virtual void PaintBackground(HintPainter context, Brush br) { }
+        public virtual void PaintForeground(HintPainter context, Hint.Kind v) { }
+        public virtual void PaintBackground(HintPainter context, Hint.Kind v) { }
 
         public virtual string CandidateString(Tile t)
         {

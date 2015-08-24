@@ -51,20 +51,20 @@ namespace Sudoku
             return "?";
         }
 
-        public override void PaintForeground(HintPainter hp, Brush br)
+        public override void PaintForeground(HintPainter hp, Hint.Kind v)
         {
             PaintContext context = (PaintContext)hp;
             if (house == Houses.Column)
             {
                 for (int y = 0; y < 9; ++y)
                     if (context.grid.FlagAt(i0, y) == SudokuGrid.CellFlags.Free)
-                        context.DrawSubcell(br, i0, y, i1);
+                        context.SetPencil(i0, y, i1, v);
             }
             else if (house == Houses.Row)
             {
                 for (int x = 0; x < 9; ++x)
                     if (context.grid.FlagAt(x, i0) == SudokuGrid.CellFlags.Free)
-                        context.DrawSubcell(br, x, i0, i1);
+                        context.SetPencil(x, i0,i1, v);
             }
             else if (house == Houses.Box)
             {
@@ -72,23 +72,24 @@ namespace Sudoku
                     for (int y = 0; y < 9; ++y)
                         if (context.grid.FlagAt(x, y) == SudokuGrid.CellFlags.Free &&
                             context.grid.BoxAt(x, y) == i0)
-                            context.DrawSubcell(br, x, y, i1);
+                            context.SetPencil(x, y, i1, v);
             }
             else if (house == Houses.MajorDiagonal)
             {
                 for (int x = 0; x < 9; ++x)
                     if (context.grid.FlagAt(x, x) == SudokuGrid.CellFlags.Free)
-                        context.DrawSubcell(br, x, x, i0);
+                        context.SetPencil(x, x, i0, v);
             }
             else if (house == Houses.MinorDiagonal)
                 for (int x = 0; x < 9; ++x)
                     if (context.grid.FlagAt(x, 8 - x) == SudokuGrid.CellFlags.Free)
-                        context.DrawSubcell(br, x, 8 - x, i0);
+                        context.SetPencil(x, 8-x, i0, v);
         }
 
-        public override void PaintBackground(HintPainter hp, Brush back)
+        public override void PaintBackground(HintPainter hp, Hint.Kind v)
         {
             PaintContext context = (PaintContext)hp;
+            Brush back = PaintContext.BackgroundBrush(v);
             if (house == Houses.Cell)
                 context.FillCell(i0, i1, back);
             else if (house == Houses.Column)

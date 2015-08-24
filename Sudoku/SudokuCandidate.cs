@@ -44,16 +44,16 @@ namespace Sudoku
             return "fill " + (1 + x) + "," + (1 + y) + " with " + (1 + n);
         }
 
-        public override void PaintForeground(HintPainter hp, Brush br)
+        public override void PaintForeground(HintPainter hp, Hint.Kind v)
         {
             PaintContext context = (PaintContext)hp;
-            context.DrawSubcell(br, x, y, n);
+            context.SetPencil(this, v);
         }
 
-        public override void PaintBackground(HintPainter hp, Brush br)
+        public override void PaintBackground(HintPainter hp, Hint.Kind v)
         {
             PaintContext context = (PaintContext)hp;
-            context.FillCell(x, y, br);
+            context.FillCell(x, y, v);
         }
 
     }

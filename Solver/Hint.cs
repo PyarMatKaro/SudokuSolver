@@ -8,6 +8,13 @@ namespace Solver
 {
     public abstract class Hint
     {
+        public enum Kind {
+            Never, // candidate cannot be selected
+            Maybe, // candidate may or may not be selected
+            Must, // candidate must be selected
+            AmongMust // another candidate must be selected for the requirement
+        };
+
         public abstract override string ToString();
         public abstract SolveResult Apply(Problem grid);
 
@@ -41,12 +48,12 @@ namespace Solver
 
         public override void PaintBackground(HintPainter context)
         {
-            c.PaintBackground(context, Brushes.Pink);
+            c.PaintBackground(context, 0);
         }
 
         public override void PaintForeground(HintPainter context)
         {
-            c.PaintForeground(context, Brushes.Red);
+            c.PaintForeground(context, 0);
         }
     }
 
@@ -77,13 +84,13 @@ namespace Solver
 
         public override void PaintBackground(HintPainter context)
         {
-            Requirement.PaintBackground(context, Brushes.LightGreen);
-            Candidate.PaintBackground(context, Brushes.Green);
+            Requirement.PaintBackground(context, Hint.Kind.AmongMust);
+            Candidate.PaintBackground(context, Hint.Kind.Must);
         }
 
         public override void PaintForeground(HintPainter context)
         {
-            Candidate.PaintForeground(context, Brushes.White);
+            Candidate.PaintForeground(context, Hint.Kind.Must);
         }
 
     }
@@ -117,7 +124,7 @@ namespace Solver
 
         public override void PaintForeground(HintPainter context)
         {
-            Candidate.PaintForeground(context, Brushes.Red);
+            Candidate.PaintForeground(context, 0);
         }
 
     }
@@ -149,7 +156,7 @@ namespace Solver
 
         public override void PaintForeground(HintPainter context)
         {
-            Candidate.PaintForeground(context, Brushes.Green);
+            Candidate.PaintForeground(context, Hint.Kind.AmongMust);
         }
 
     }
@@ -172,7 +179,7 @@ namespace Solver
 
         public override void PaintForeground(HintPainter context)
         {
-            Candidate.PaintForeground(context, Brushes.Green);
+            Candidate.PaintForeground(context, Hint.Kind.AmongMust);
         }
 
         public override SolveResult Apply(Problem grid)
