@@ -9,7 +9,7 @@ namespace Sudoku
     public class CageOptional : SudokuRequirement
     {
         SudokuGrid.CageInfo info;
-        Candidate[] removed;
+        SudokuCandidate[] removed;
 
         public CageOptional(SudokuGrid.CageInfo info)
         {
@@ -18,19 +18,28 @@ namespace Sudoku
 
         void Filter(SudokuSolver ss, int cage, Func<int, bool> included)
         {
-            List<Candidate> toRemove = new List<Solver.Candidate>();
+            List<SudokuCandidate> toRemove = new List<SudokuCandidate>();
             for (int i = 0; i < 9; ++i) if (!included(i + 1))
                 {
                     CageOptional co = ss.GetCageOptional(i, cage);
                     if (co.Included)
                     {
-                        toRemove.AddRange(co.UnselectedCandidates);
+                        foreach(SudokuCandidate sc in co.UnselectedCandidates)
+                            if (!sc.IsMarked)
+                            {
+                                toRemove.Add(sc);
+                                sc.MarkCandidate(true);
+                            }
                     }
                 }
 
             removed = toRemove.ToArray();
             for (int i = 0; i < removed.Length; ++i)
-                ss.DiscardCandidate(removed[i]);
+            {
+                SudokuCandidate sc = removed[i];
+                ss.DiscardCandidate(sc);
+                sc.MarkCandidate(false);
+            }
         }
 
         public void OnCover(ExactCover ec, SudokuCandidate sc)
@@ -49,6 +58,7 @@ namespace Sudoku
                 int total = info.remaining_totals[cage];
                 Filter(ss, cage, (int n) => (n == total));
             }
+                /*
             else if(s > 1)
             {
                 // 's' numbers left to choose from
@@ -56,7 +66,7 @@ namespace Sudoku
                 int min = s * (s + 1) / 2;
                 int max = 45 - s * (s - 1) / 2;
                 Filter(ss, cage, (int n) => total + n >= min && total + n <= max);
-            }
+            }*/
         }
 
         public void OnUncover(ExactCover ec, SudokuCandidate sc)

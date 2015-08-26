@@ -35,7 +35,7 @@ namespace Solver
             t.included = true;
         }
 
-        internal void MarkCandidate(bool mark)
+        public void MarkCandidate(bool mark)
         {
             marked = mark;
         }
