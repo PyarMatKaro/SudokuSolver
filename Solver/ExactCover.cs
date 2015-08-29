@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace Solver
 {
@@ -9,8 +10,7 @@ namespace Solver
 
     public abstract class ExactCover
     {
-        bool verbose = false;
-
+        public TextWriter log;
         protected Candidate[] tr;
         protected int trc;
         protected Tile[] ts;
@@ -126,22 +126,22 @@ namespace Solver
                 return OnSolution();
 
             Requirement c = EasiestRequirement;
-            if (verbose)
-                Console.WriteLine(c.ToString());
+            if (log != null)
+                log.WriteLine(c.ToString());
             int s = c.s;
             int i = 0;
             if (s == 0)
                 return false;
             c.Cover();
-            if (verbose && s != 1)
-                Console.WriteLine("(start of loop)");
+            if (log != null && s != 1)
+                log.WriteLine("(start of loop)");
             bool brk = false;
             for (Tile r = c.d; r != c; r = r.d)
             {
-                if (verbose && s != 1)
-                    Console.WriteLine("(loop " + (++i) + "/" + s + ")");
-                if (verbose)
-                    Console.WriteLine(r.Candidate.ToString());
+                if (log != null && s != 1)
+                    log.WriteLine("(loop " + (++i) + "/" + s + ")");
+                if (log != null)
+                    log.WriteLine(r.Candidate.ToString());
                 CoverRow(r);
                 brk = BacktrackingSearch();
                 UncoverRow();
@@ -149,8 +149,8 @@ namespace Solver
                     break;
             }
             c.Uncover();
-            if (verbose && s != 1)
-                Console.WriteLine("(end of loop)");
+            if (log != null && s != 1)
+                log.WriteLine("(end of loop)");
             return brk;
         }
 

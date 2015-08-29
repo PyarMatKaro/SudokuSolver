@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Solver;
 using System.Drawing.Drawing2D;
+using System.IO;
 
 namespace Sudoku
 {
@@ -491,6 +492,17 @@ namespace Sudoku
         {
             SolveResult solns = solver.DoBacktrackingSolve(this);
             ShowSolveResult(solns);
+        }
+
+        void SolveBacktracking(string log)
+        {
+            FileStream fs = new FileStream(log, FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs);
+            solver.log = sw;
+            SolveResult solns = solver.DoBacktrackingSolve(this);
+            ShowSolveResult(solns);
+            sw.Close();
+            solver.log = null;
         }
 
         public void SolveLevel(HintSelections.Level level)
