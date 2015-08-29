@@ -1,5 +1,7 @@
 ﻿To Do
 
+Save Game as well as Save Grid
+
 Bugs with solving Killer:
  With "show hints" off, load Killer1, solve with backtracking twice, first time fails, second time works
  Shows running total as 0 with backtracking solution
