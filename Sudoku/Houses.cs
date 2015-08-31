@@ -5,5 +5,5 @@ using System.Text;
 
 namespace Sudoku
 {
-    public enum Houses { Cell = 0, Column, Row, Box, MajorDiagonal, MinorDiagonal };
+    public enum Houses { Cell = 0, Column, Row, Box, MajorDiagonal, MinorDiagonal, Cage };
 }

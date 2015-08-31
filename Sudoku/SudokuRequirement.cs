@@ -17,7 +17,7 @@ namespace Sudoku
             ClearRequirement(1);
         }
 
-        public bool AppliesAt(int x, int y, int b)
+        public bool AppliesAt(int x, int y, SudokuGrid grid)
         {
             if (house == Houses.Cell)
                 return x == i0 && y == i1;
@@ -26,11 +26,13 @@ namespace Sudoku
             if (house == Houses.Row)
                 return y == i0;
             if (house == Houses.Box)
-                return b == i0;
+                return grid.BoxAt(x,y) == i0;
             if (house == Houses.MajorDiagonal)
                 return x == y;
             if (house == Houses.MinorDiagonal)
                 return x == 8 - y;
+            if (house == Houses.Cage)
+                return grid.CageAt(x, y) == i0;
             return false;
         }
 
@@ -38,16 +40,18 @@ namespace Sudoku
         {
             if (house == Houses.Cell)
                 return "fill cell at " + (1 + i0) + "," + (1 + i1);
-            else if (house == Houses.Column)
+            if (house == Houses.Column)
                 return "place " + (1 + i1) + " in column " + (1 + i0);
-            else if (house == Houses.Row)
+            if (house == Houses.Row)
                 return "place " + (1 + i1) + " in row " + (1 + i0);
-            else if (house == Houses.Box)
+            if (house == Houses.Box)
                 return "place " + (1 + i1) + " in box " + (1 + i0);
-            else if (house == Houses.MajorDiagonal)
+            if (house == Houses.MajorDiagonal)
                 return "place " + (1 + i0) + " in major diagonal";
-            else if (house == Houses.MinorDiagonal)
+            if (house == Houses.MinorDiagonal)
                 return "place " + (1 + i0) + " in minor diagonal";
+            if(house == Houses.Cage)
+                return "place " + (i1 + 1) + " in cage " + (i0 + 1);
             return "?";
         }
 

@@ -33,6 +33,11 @@ namespace Solver
             }
         }
 
+        public void SetIncluded()
+        {
+            included = true;
+        }
+
         internal void ExcludeH()
         {
             r.l = l;

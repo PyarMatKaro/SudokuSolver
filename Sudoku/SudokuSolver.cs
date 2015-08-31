@@ -12,7 +12,7 @@ namespace Sudoku
         private int solnsFound;
         private Candidate[] sampleSoln;
         protected SudokuRequirement[] ca;
-        protected CageOptional[] co;
+        protected CageOptional[,] co;
 
         public SudokuSolver(SudokuGrid grid)
         {
@@ -32,9 +32,10 @@ namespace Sudoku
 
         protected void CreateOptionals(SudokuGrid grid, int nc)
         {
-            co = new CageOptional[nc];
-            for (int i = 0; i < co.Length; ++i)
-                co[i] = new CageOptional(grid.cageInfo);
+            co = new CageOptional[nc, 9];
+            for (int i0 = 0; i0 < nc; ++i0)
+                for (int i1 = 0; i1 < 9; ++i1)
+                    co[i0, i1] = new CageOptional(grid.cageInfo);
         }
 
         public SolveResult DoLogicalSolve(SudokuGrid grid, HintSelections hs)
@@ -96,9 +97,9 @@ namespace Sudoku
             return ca[ 9 * 9 * 4 + 9 + n];
         }
 
-        public CageOptional GetCageOptional(int n, int cage)
+        public CageOptional GetCageOptional(int cage, int n)
         {
-            return co[n + cage * 9];
+            return co[cage, n];
         }
 
         /*
@@ -114,7 +115,7 @@ namespace Sudoku
             // Create requirements - columns of 0/1 matrix
             int num_cages = grid.NumCages;
             CreateRequirements(9 * 9 * 4 + grid.NumDiagonals * 9);
-            CreateOptionals(grid, 9 * num_cages);
+            CreateOptionals(grid, num_cages);
             Houses[] houses = new Houses[]{
                 Houses.Cell,
                 Houses.Column,
@@ -157,6 +158,16 @@ namespace Sudoku
                     requirements.AddRequirement(c);
                 }
             }
+            for (int i0 = 0; i0 < num_cages; ++i0)
+                for (int i1 = 0; i1 < 9; ++i1)
+                {
+                    CageOptional ca = GetCageOptional(i0, i1);
+                    ca.i0 = i0;
+                    ca.i1 = i1;
+                    ca.house = Houses.Cage;
+                    //optionals.AddRequirement(ca);
+                    ca.SetIncluded();
+                }
             
             // Create candidates - rows of 0/1 matrix
             CreateCandidates(new SudokuCandidate[9 * 9 * 9]);
@@ -179,7 +190,7 @@ namespace Sudoku
                         if (grid.NumDiagonals > 1 && x == 8 - y)
                             k.AddCandidate(GetMinorDiagonalRequirement(n));
                         if (cage != -1)
-                            k.AddCageOptional(GetCageOptional(n, cage));
+                            k.AddCageOptional(GetCageOptional(cage, n));
                         tr[trc++] = k;
 
                         // Discard candidates where cage size already reached 1
@@ -188,6 +199,10 @@ namespace Sudoku
                     }
                 }
             }
+
+            // Discard candidates that do not meet cage total
+            for (int i0 = 0; i0 < num_cages; ++i0)
+                CageOptional.CheckRemains(this, grid.cageInfo, i0);
 
             /*
             if (grid.IsKiller)

@@ -835,6 +835,7 @@ namespace Sudoku
             colours = cs.Solve(this, cageInfo.cages, NumCages);
 
             cageInfo.Reset();
+            /*
             for (int y = 0; y < 9; ++y)
                 for (int x = 0; x < 9; ++x)
                 {
@@ -845,6 +846,7 @@ namespace Sudoku
                         flags[x, y] = CellFlags.Fixed;
                     }
                 }
+             */
 
             ResetSolver();
             return true;

@@ -16,12 +16,12 @@ namespace Sudoku
             this.info = info;
         }
 
-        void Filter(SudokuSolver ss, int cage, Func<int, bool> included)
+        static SudokuCandidate[] Filter(SudokuSolver ss, int cage, Func<int, bool> included)
         {
             List<SudokuCandidate> toRemove = new List<SudokuCandidate>();
             for (int i = 0; i < 9; ++i) if (!included(i + 1))
                 {
-                    CageOptional co = ss.GetCageOptional(i, cage);
+                    CageOptional co = ss.GetCageOptional(cage, i);
                     if (co.Included)
                     {
                         foreach(SudokuCandidate sc in co.UnselectedCandidates)
@@ -33,13 +33,36 @@ namespace Sudoku
                     }
                 }
 
-            removed = toRemove.ToArray();
+            SudokuCandidate[] removed = toRemove.ToArray();
             for (int i = 0; i < removed.Length; ++i)
             {
                 SudokuCandidate sc = removed[i];
                 ss.DiscardCandidate(sc);
                 sc.MarkCandidate(false);
             }
+            return removed.ToArray();
+        }
+
+        public static SudokuCandidate[] CheckRemains(SudokuSolver ss, SudokuGrid.CageInfo info, int cage)
+        {
+            int s = info.remaining_sizes[cage];
+            if (s == 1)
+            {
+                // One empty cell remains in the cage, so make the total
+                int total = info.remaining_totals[cage];
+                return Filter(ss, cage, (int n) => (n == total));
+            }
+            /*
+            else if(s > 1)
+            {
+                // 's' numbers left to choose from
+                int total = info.remaining_totals[cage];
+                int min = s * (s + 1) / 2;
+                int max = 45 - s * (s - 1) / 2;
+                Filter(ss, cage, (int n) => total + n >= min && total + n <= max);
+            }
+            */
+            return null;
         }
 
         public void OnCover(ExactCover ec, SudokuCandidate sc)
@@ -50,23 +73,7 @@ namespace Sudoku
             SudokuSolver ss = (SudokuSolver)ec;
             info.remaining_totals[cage] -= num;
             info.remaining_sizes[cage]--;
-            removed = null;
-            int s = info.remaining_sizes[cage];
-            if(s == 1)
-            {
-                // One empty cell remains in the cage, so make the total
-                int total = info.remaining_totals[cage];
-                Filter(ss, cage, (int n) => (n == total));
-            }
-                /*
-            else if(s > 1)
-            {
-                // 's' numbers left to choose from
-                int total = info.remaining_totals[cage];
-                int min = s * (s + 1) / 2;
-                int max = 45 - s * (s - 1) / 2;
-                Filter(ss, cage, (int n) => total + n >= min && total + n <= max);
-            }*/
+            removed = CheckRemains(ss, info, cage);
         }
 
         public void OnUncover(ExactCover ec, SudokuCandidate sc)

@@ -212,7 +212,7 @@ namespace Sudoku
 
         string toolTipText;
 
-        static bool AppliesAt(Hint hint, int x, int y, int b)
+        static bool AppliesAt(Hint hint, int x, int y, SudokuGrid grid)
         {
             if (!(hint is ForcedMoveHint))
             {
@@ -221,18 +221,18 @@ namespace Sudoku
                     return k.x == x && k.y == y;
             }
 
-            SudokuRequirement c = (SudokuRequirement) hint.Requirement;
-            if(c != null)
-                return c.AppliesAt(x,y,b);
+            SudokuRequirement c = (SudokuRequirement)hint.Requirement;
+            if (c != null)
+                return c.AppliesAt(x, y, grid);
 
             return false;
         }
 
-        void UpdateTooltip(int x, int y, int b)
+        void UpdateTooltip(int x, int y, SudokuGrid grid)
         {
             StringBuilder hints = new StringBuilder();
             foreach (Hint hint in Grid.PaintedHints)
-                if (AppliesAt(hint, x, y, b))
+                if (AppliesAt(hint, x, y, grid))
                     hints.AppendLine(hint.ToString());
             if (hints.Length == 0)
             {
@@ -266,8 +266,7 @@ namespace Sudoku
                 toolTip1.Active = false;
                 return;
             }
-            int b = Grid.BoxAt(x, y);
-            UpdateTooltip(x, y, b);
+            UpdateTooltip(x, y, Grid);
         }
     }
 }
