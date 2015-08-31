@@ -307,7 +307,8 @@ namespace Sudoku
                 else
                     paintedHints = new Hint[0];
             }
-            else if (requestedHint || HintFlags.PaintHints)
+            else if ((requestedHint && paintedHints.Length == 0)
+                || HintFlags.PaintHints)
             {
                 //if (hintAutoSolve.ForcedHints)
                 //    solver.FollowSingleOptions();
