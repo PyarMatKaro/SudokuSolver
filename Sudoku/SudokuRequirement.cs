@@ -45,7 +45,7 @@ namespace Sudoku
             if (house == Houses.Row)
                 return "place " + (1 + i1) + " in row " + (1 + i0);
             if (house == Houses.Box)
-                return "place " + (1 + i1) + " in box " + (1 + i0);
+                return "place " + (1 + i1) + " in box " + (char)('a' + i0);
             if (house == Houses.MajorDiagonal)
                 return "place " + (1 + i0) + " in major diagonal";
             if (house == Houses.MinorDiagonal)
