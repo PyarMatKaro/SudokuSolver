@@ -202,7 +202,7 @@ namespace Sudoku
 
             // Discard candidates that do not meet cage total
             for (int i0 = 0; i0 < num_cages; ++i0)
-                CageOptional.CheckRemains(this, grid.cageInfo, i0);
+                CageOptional.CheckRemains(this, grid.cageInfo, i0, -1);
 
             /*
             if (grid.IsKiller)

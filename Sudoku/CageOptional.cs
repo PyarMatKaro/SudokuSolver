@@ -43,7 +43,7 @@ namespace Sudoku
             return removed.ToArray();
         }
 
-        public static SudokuCandidate[] CheckRemains(SudokuSolver ss, SudokuGrid.CageInfo info, int cage)
+        public static SudokuCandidate[] CheckRemains(SudokuSolver ss, SudokuGrid.CageInfo info, int cage, int ex)
         {
             int s = info.remaining_sizes[cage];
             if (s == 1)
@@ -52,16 +52,16 @@ namespace Sudoku
                 int total = info.remaining_totals[cage];
                 return Filter(ss, cage, (int n) => (n == total));
             }
-            /*
+                /*
             else if(s > 1)
             {
                 // 's' numbers left to choose from
                 int total = info.remaining_totals[cage];
-                int min = s * (s + 1) / 2;
-                int max = 45 - s * (s - 1) / 2;
-                Filter(ss, cage, (int n) => total + n >= min && total + n <= max);
+                int m0 = total - 45 + (11 - s) * (10 - s) / 2;
+                int m1 = total - s * (s - 1) / 2;
+                Filter(ss, cage, (int n) => n == ex || (n >= m0 && n <= m1));
             }
-            */
+                 * */
             return null;
         }
 
@@ -73,7 +73,7 @@ namespace Sudoku
             SudokuSolver ss = (SudokuSolver)ec;
             info.remaining_totals[cage] -= num;
             info.remaining_sizes[cage]--;
-            removed = CheckRemains(ss, info, cage);
+            removed = CheckRemains(ss, info, cage, num);
         }
 
         public void OnUncover(ExactCover ec, SudokuCandidate sc)
