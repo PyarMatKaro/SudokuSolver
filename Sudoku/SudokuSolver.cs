@@ -87,14 +87,9 @@ namespace Sudoku
             return ca[x + y * 9 + type * 9 * 9];
         }
 
-        SudokuRequirement GetMajorDiagonalRequirement(int n)
+        SudokuRequirement GetDiagonalRequirement(int d, int n)
         {
-            return ca[ 9 * 9 * 4 + n];
-        }
-
-        SudokuRequirement GetMinorDiagonalRequirement(int n)
-        {
-            return ca[ 9 * 9 * 4 + 9 + n];
+            return ca[ 9 * 9 * 4 + 9 * d + n];
         }
 
         public CageOptional GetCageOptional(int cage, int n)
@@ -114,7 +109,13 @@ namespace Sudoku
         {
             // Create requirements - columns of 0/1 matrix
             int num_cages = grid.NumCages;
-            CreateRequirements(9 * 9 * 4 + grid.NumDiagonals * 9);
+            int diags = 0;
+            if (grid.MajorDiagonal)
+                ++diags;
+            if (grid.MinorDiagonal)
+                ++diags;
+            int d = grid.MajorDiagonal ? 1 : 0; // Where minor diagonal is found
+            CreateRequirements(9 * 9 * 4 + diags * 9);
             CreateOptionals(grid, num_cages);
             Houses[] houses = new Houses[]{
                 Houses.Cell,
@@ -136,22 +137,22 @@ namespace Sudoku
                     }
                 }
             }
-            if (grid.NumDiagonals > 0)
+            if (grid.MajorDiagonal)
             {
                 for (int i0 = 0; i0 < 9; ++i0)
                 {
-                    SudokuRequirement c = GetMajorDiagonalRequirement(i0);
+                    SudokuRequirement c = GetDiagonalRequirement(0, i0);
                     c.i0 = i0;
                     c.i1 = -1;
                     c.house = Houses.MajorDiagonal;
                     requirements.AddRequirement(c);
                 }
             }
-            if (grid.NumDiagonals > 1)
+            if (grid.MinorDiagonal)
             {
                 for (int i0 = 0; i0 < 9; ++i0)
                 {
-                    SudokuRequirement c = GetMinorDiagonalRequirement(i0);
+                    SudokuRequirement c = GetDiagonalRequirement(d, i0);
                     c.i0 = i0;
                     c.i1 = -1;
                     c.house = Houses.MinorDiagonal;
@@ -185,10 +186,10 @@ namespace Sudoku
                         k.AddCandidate(GetRequirement(x, n, Houses.Column));
                         k.AddCandidate(GetRequirement(y, n, Houses.Row));
                         k.AddCandidate(GetRequirement(box, n, Houses.Box));
-                        if (grid.NumDiagonals > 0 && x == y)
-                            k.AddCandidate(GetMajorDiagonalRequirement(n));
-                        if (grid.NumDiagonals > 1 && x == 8 - y)
-                            k.AddCandidate(GetMinorDiagonalRequirement(n));
+                        if (grid.MajorDiagonal && x == y)
+                            k.AddCandidate(GetDiagonalRequirement(0, n));
+                        if (grid.MinorDiagonal && x == 8 - y)
+                            k.AddCandidate(GetDiagonalRequirement(d, n));
                         if (cage != -1)
                             k.AddCageOptional(GetCageOptional(cage, n));
                         tr[trc++] = k;

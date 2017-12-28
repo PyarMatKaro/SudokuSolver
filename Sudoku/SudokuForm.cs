@@ -106,19 +106,24 @@ namespace Sudoku
 
         private void newGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.ClearGrid(0);
+            var options = new SudokuGrid.GridOptions();
+            Grid.ClearGrid(options);
             Grid.ResetSolver();
         }
 
         private void new1DiagonalGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.ClearGrid(1);
+            var options = new SudokuGrid.GridOptions();
+            options.majorDiagonal = true;
+            Grid.ClearGrid(options);
             Grid.ResetSolver();
         }
 
         private void new2DiagonalsGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.ClearGrid(2);
+            var options = new SudokuGrid.GridOptions();
+            options.majorDiagonal = options.minorDiagonal = true;
+            Grid.ClearGrid(options);
             Grid.ResetSolver();
         }
 
