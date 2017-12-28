@@ -243,8 +243,10 @@ namespace Sudoku
             Graphics graphics = context.graphics;
 
             // Background
-            Brush back = (solver.UnfulfilledRequirements.Length == 0)
-                ? Brushes.LightGreen : Brushes.White;
+            Brush back =
+                (PlayMode == PlayModes.Edit) ? Brushes.LightSalmon :
+                (solver.UnfulfilledRequirements.Length == 0) ? Brushes.LightGreen :
+                Brushes.White;
             context.FillBackground(back);
 
             // Coloured cages or boxes

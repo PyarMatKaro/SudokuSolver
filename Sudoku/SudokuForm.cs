@@ -247,5 +247,10 @@ namespace Sudoku
             Grid.PlayMode = SudokuGrid.PlayModes.Play;
             UpdateMode();
         }
+
+        private void SudokuForm_Load(object sender, EventArgs e)
+        {
+            ClientSize = new Size(386, 440); // Make border visible
+        }
     }
 }
