@@ -678,6 +678,8 @@ namespace Sudoku
             cageInfo = null;
             if (SetGridStrings9x9Jigsaw(a))
                 return;
+            if (SetGridStrings81Jigsaw(a))
+                return;
             if (SetGridStrings9x9(a))
                 return;
             SetGridStrings81(a);
@@ -907,6 +909,40 @@ namespace Sudoku
                     }
                     boxes[x, y] = b - 'a';
                 }
+
+            ColourSolver cs = new ColourSolver();
+            colours = cs.Solve(this, boxes, 9);
+            ResetSolver();
+            return true;
+        }
+
+        public bool SetGridStrings81Jigsaw(string[] a)
+        {
+            // format used at www.icosahedral.net
+            string[] a2 = (from string line in a where line.Length == 81 select line).ToArray();
+            if (a2.Length != 2)
+                return false;
+            for (int i = 0; i < 81; ++i)
+            {
+                int x = i % 9;
+                int y = i / 9;
+                char c = a2[0][i];
+                char b = a2[1][i];
+                if (c >= '0' && c <= '8')
+                {
+                    values[x, y] = c - '0';
+                    flags[x, y] = CellFlags.Fixed;
+                }
+                else
+                {
+                    values[x, y] = -1;
+                    flags[x, y] = CellFlags.Free;
+                }
+                if (b == '.')
+                    boxes[x, y] = 8;
+                else
+                    boxes[x, y] = b - '0';
+            }
 
             ColourSolver cs = new ColourSolver();
             colours = cs.Solve(this, boxes, 9);
