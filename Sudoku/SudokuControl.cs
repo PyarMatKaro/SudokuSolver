@@ -59,7 +59,12 @@ namespace Sudoku
             int y = e.Y / cs.Height;
             if (x < 0 || x >= 9 || y < 0 || y >= 9)
                 return;
-            if (x == selx && y == sely)
+            if (grid.PlayMode == SudokuGrid.PlayModes.EditBox)
+            {
+                if (grid.IsJigsaw)
+                    grid.ChangeBox(x, y);
+            }
+            else if (x == selx && y == sely)
                 selx = sely = -1;
             else
             {

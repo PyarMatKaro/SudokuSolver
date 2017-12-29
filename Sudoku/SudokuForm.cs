@@ -66,7 +66,7 @@ namespace Sudoku
 
         private void editToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Grid.PlayMode = SudokuGrid.PlayModes.Edit;
+            Grid.PlayMode = SudokuGrid.PlayModes.EditCell;
             UpdateMode();
         }
 
@@ -98,7 +98,9 @@ namespace Sudoku
 
         void UpdateMode()
         {
-            editToolStripMenuItem1.Checked = Grid.PlayMode == SudokuGrid.PlayModes.Edit;
+            editBoxToolStripMenuItem.Checked = Grid.PlayMode == SudokuGrid.PlayModes.EditBox;
+            editBoxToolStripMenuItem.Enabled = Grid.IsJigsaw;
+            editToolStripMenuItem1.Checked = Grid.PlayMode == SudokuGrid.PlayModes.EditCell;
             playToolStripMenuItem.Checked = Grid.PlayMode == SudokuGrid.PlayModes.Play;
             pencilToolStripMenuItem.Checked = Grid.PlayMode == SudokuGrid.PlayModes.Pencil;
             Grid.Updated();
@@ -251,6 +253,29 @@ namespace Sudoku
         private void SudokuForm_Load(object sender, EventArgs e)
         {
             ClientSize = new Size(386, 440); // Make border visible
+        }
+
+        private void newKillerGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var options = new SudokuGrid.GridOptions();
+            options.isKiller = true;
+            Grid.ClearGrid(options);
+            Grid.ResetSolver();
+        }
+
+        private void newJigsawGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var options = new SudokuGrid.GridOptions().DefaultColours();
+            options.isJigsaw = true;
+            Grid.ClearGrid(options);
+            Grid.ResetSolver();
+            UpdateMode();
+        }
+
+        private void editBoxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Grid.PlayMode = SudokuGrid.PlayModes.EditBox;
+            UpdateMode();
         }
     }
 }

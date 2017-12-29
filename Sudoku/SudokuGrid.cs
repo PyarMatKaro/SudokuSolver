@@ -18,7 +18,7 @@ namespace Sudoku
         //public const int FIXED = 1;
         //public const int PLAY = 2;
 
-        public enum PlayModes { Edit, Play, Pencil };
+        public enum PlayModes { EditCell, EditBox, Play, Pencil };
         public PlayModes PlayMode;
 
         List<UpdateListener> listeners = new List<UpdateListener>();
@@ -49,9 +49,10 @@ namespace Sudoku
 
             public GridOptions DefaultColours()
             {
+                colours = new int[9, 9];
                 for (int x = 0; x < 9; ++x)
                     for (int y = 0; y < 9; ++y)
-                        colours[x, y] = x + y % 2;
+                        colours[x, y] = (x / 3 + y / 3) % 4;
                 return this;
             }
 
@@ -130,6 +131,9 @@ namespace Sudoku
         public int NumCages { get { return cageInfo == null ? 0 : cageInfo.NumCages; } }
         public bool MajorDiagonal { get { return gridOptions.majorDiagonal; } }
         public bool MinorDiagonal { get { return gridOptions.minorDiagonal; } }
+
+        public bool InEditMode { get { return PlayMode == PlayModes.EditBox || PlayMode == PlayModes.EditCell; } }
+        public bool InPlayMode { get { return PlayMode == PlayModes.Play || PlayMode == PlayModes.Pencil; } }
 
         public static void ReplaceListener(UpdateListener listener, SudokuGrid value, ref SudokuGrid grid)
         {
@@ -244,7 +248,7 @@ namespace Sudoku
 
             // Background
             Brush back =
-                (PlayMode == PlayModes.Edit) ? Brushes.LightSalmon :
+                InEditMode ? Brushes.LightSalmon :
                 (solver.UnfulfilledRequirements.Length == 0) ? Brushes.LightGreen :
                 Brushes.White;
             context.FillBackground(back);
@@ -301,20 +305,35 @@ namespace Sudoku
             context.DrawSelection();
 
             // Grid
-            using (Pen thick = new Pen(Color.Black, 3.0f))
+            Dictionary<int, int> bs = new Dictionary<int, int>();
+            for (int x = 0; x < 9; ++x)
+                for (int y = 0; y < 9; ++y)
+                {
+                    int b = BoxAt(x, y);
+                    if (bs.ContainsKey(b))
+                        ++bs[b];
+                    else
+                        bs[b] = 1;
+                }
+            Func<int, int, int, int, int> border = (int x0, int y0, int x1, int y1) =>
             {
+                int b0 = BoxAt(x0, y0), b1 = BoxAt(x1, y1);
+                if (b0 == b1)
+                    return 0;
+                if (bs[b0] < 9 || bs[b1] < 9)
+                    return 2;
+                return 1;
+            };
+            using (Pen thick = new Pen(Color.Black, 3.0f))
+            using (Pen wrong = new Pen(Color.Red, 3.0f))
+            {
+                Pen[] pens = { Pens.Black, thick, wrong };
                 for (int x = 0; x < 8; ++x)
                     for (int y = 0; y < 9; ++y)
-                    {
-                        Pen p = BoxAt(x, y) == BoxAt(x + 1, y) ? Pens.Black : thick;
-                        context.DrawVerticalLine(x, y, p);
-                    }
+                        context.DrawVerticalLine(x, y, pens[border(x, y, x + 1, y)]);
                 for (int x = 0; x < 9; ++x)
                     for (int y = 0; y < 8; ++y)
-                    {
-                        Pen p = BoxAt(x, y) == BoxAt(x, y + 1) ? Pens.Black : thick;
-                        context.DrawHorizontalLine(x, y, p);
-                    }
+                        context.DrawHorizontalLine(x, y, pens[border(x, y, x, y + 1)]);
             }
 
             // Givens
@@ -352,7 +371,7 @@ namespace Sudoku
 
         void UpdatePaintedHints(bool requestedHint)
         {
-            if (PlayMode == PlayModes.Edit)
+            if (InEditMode)
             {
                 Hint hint = solver.SingleImpossibleHint;
                 if (hint != null)
@@ -378,7 +397,7 @@ namespace Sudoku
 
         public bool ClearCell(int x, int y)
         {
-            if (flags[x, y] == CellFlags.Fixed && PlayMode != PlayModes.Edit)
+            if (flags[x, y] == CellFlags.Fixed && PlayMode != PlayModes.EditCell)
                 return false;
             if (flags[x, y] != CellFlags.Free)
             {
@@ -395,10 +414,12 @@ namespace Sudoku
 
         public bool SetCell(int x, int y, int n, PlayModes playMode)
         {
+            if (playMode == PlayModes.EditBox)
+                return false;
             if (playMode == PlayModes.Pencil)
                 return PencilCell(x, y, n);
 
-            CellFlags fx = playMode == PlayModes.Edit ? CellFlags.Fixed : CellFlags.Play;
+            CellFlags fx = playMode == PlayModes.EditCell ? CellFlags.Fixed : CellFlags.Play;
             if (flags[x, y] == CellFlags.Free)
                 return SetFreeCell(x, y, n, fx);
             else
@@ -1014,7 +1035,7 @@ namespace Sudoku
                 ans[sc.x, sc.y] = sc.n;
             }
             // Add clues until soluable
-            PlayMode = PlayModes.Edit;
+            PlayMode = PlayModes.EditCell;
             while (true)
             {
                 SolveResult sr = solver.DoLogicalSolve(this, hints);
@@ -1044,5 +1065,25 @@ namespace Sudoku
             ResetSolver();
         }
 
+        public static IEnumerable<Tuple<int,int>> Neighbours(int x, int y)
+        {
+            for (int dx = -1; dx <= 1; ++dx)
+                for (int dy = -1; dy <= 1; ++dy)
+                    if ((dx != 0 || dy != 0) && (dx == 0 || dy == 0) && x + dx >= 0 && y + dy >= 0 && x + dx < 9 && y + dy < 9)
+                        yield return new Tuple<int, int>(x + dx, y + dy);
+        }
+
+        public void ChangeBox(int x, int y)
+        {
+            Func<Tuple<int, int>, int> getBox = (Tuple<int, int> p) => gridOptions.boxes[p.Item1, p.Item2];
+            List<int> bs = new List<int>();
+            foreach (int b in from p in Neighbours(x, y) select getBox(p))
+                if (!bs.Contains(b))
+                    bs.Add(b);
+            int i = bs.IndexOf(gridOptions.boxes[x, y]);
+            gridOptions.boxes[x, y] = bs[i == bs.Count - 1 ? 0 : i + 1];
+            ColourSolver cs = new ColourSolver();
+            gridOptions.colours = cs.Solve(this, gridOptions.boxes, 9);
+        }
     }
 }
