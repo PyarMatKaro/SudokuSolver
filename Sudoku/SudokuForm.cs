@@ -85,7 +85,7 @@ namespace Sudoku
                 UpdateHintChecks();
                 return true;
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 return false;
             }

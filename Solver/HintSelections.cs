@@ -46,6 +46,15 @@ namespace Solver
                 EventualSolutions == hs.EventualSolutions;
         }
 
+        public override int GetHashCode()
+        {
+            bool[] b = { ForcedMoves, ImmediateDiscardables, EventualDiscardables, Selectables, EventualSolutions };
+            int n = 0;
+            for (int i = 0; i < b.Length; ++i)
+                n = (n << 1) | (b[i] ? 1 : 0);
+            return n;
+        }
+
         public bool IsLevel(Level level)
         {
             HintSelections hs = new HintSelections(level);

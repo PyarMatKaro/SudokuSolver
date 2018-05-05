@@ -123,13 +123,13 @@ namespace Sudoku
     public class ColourRequirement : Requirement
     {
         // For each side of a border and colour, it's either picked or unpicked
-        public int co, ca, n;
+        public int co, ca, b;
 
-        public ColourRequirement(int _co, int _ca, int _n) { co = _co; ca = _ca; n = _n; }
+        public ColourRequirement(int _co, int _ca, int _b) { co = _co; ca = _ca; b = _b; }
 
         public override string RequirementString()
         {
-            return "Pick colour " + co + " at cage " + ca + " border " + n;
+            return "Pick colour " + co + " at cage " + ca + " border " + b;
         }
     }
 
