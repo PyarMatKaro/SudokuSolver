@@ -134,6 +134,11 @@ namespace Sudoku
             Grid.SolveLogically();
         }
 
+        private void proofToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Grid.SolveProof();
+        }
+
         private void solveWithBacktrackingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Grid.SolveBacktracking();

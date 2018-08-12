@@ -563,6 +563,31 @@ namespace Sudoku
             ShowSolveResult(SolveResult.TooDifficult);
         }
 
+        public void SolveProof()
+        {
+            var old = solver.log;
+            using (MemoryStream ms = new MemoryStream())
+            {                
+                solver.log = new StreamWriter(ms);
+                SolveResult solns = solver.DoBacktrackingSolve(this);
+                ms.Position = 0;
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine(DescribeSolveResult(solns));
+                string line;
+                using (StreamReader sr = new StreamReader(ms))
+                    while ((line = sr.ReadLine()) != null)
+                        sb.AppendLine(line);
+                solver.log = old;
+
+                TextForm form = new TextForm();
+                form.btnCancel.Visible = false;
+                form.tbText.ReadOnly = true;
+                form.tbText.Text = sb.ToString();
+                form.ShowDialog();
+            }
+
+        }
+
         public void SolveBacktracking()
         {
             SolveResult solns = solver.DoBacktrackingSolve(this);
@@ -586,26 +611,42 @@ namespace Sudoku
             MessageBox.Show("Solution found, " + level, "Solve", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public void ShowSolveResult(SolveResult solns)
+        public string DescribeSolveResult(SolveResult solns, out MessageBoxIcon? kind)
         {
-            Updated(); // May have made some progress
             switch (solns)
             {
                 case SolveResult.MultipleSolutions:
-                    MessageBox.Show("Multiple solutions", "Solve", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
+                    kind = MessageBoxIcon.Error;
+                    return "Multiple solutions";
                 case SolveResult.NoSolutions:
-                    MessageBox.Show("No solutions", "Solve", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    break;
+                    kind = MessageBoxIcon.Error;
+                    return "No solutions";
+                default:
                 case SolveResult.Ongoing:
-                    break;
+                    kind = null;
+                    return null;
                 case SolveResult.SingleSolution:
-                    MessageBox.Show("Single solution found", "Solve", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    break;
+                    kind = MessageBoxIcon.Information;
+                    return "Single solution found";
                 case SolveResult.TooDifficult:
-                    MessageBox.Show("Too difficult", "Solve", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    break;
+                    kind = MessageBoxIcon.Information;
+                    return "Too difficult";
             }
+        }
+
+        public string DescribeSolveResult(SolveResult solns)
+        {
+            MessageBoxIcon? icon;
+            return DescribeSolveResult(solns, out icon);
+        }
+
+        public void ShowSolveResult(SolveResult solns)
+        {
+            Updated(); // May have made some progress
+            MessageBoxIcon? icon;
+            string message = DescribeSolveResult(solns, out icon);
+            if(icon!=null)
+                MessageBox.Show(message, "Solve", MessageBoxButtons.OK, icon.Value);
         }
 
         public void FireChanged()

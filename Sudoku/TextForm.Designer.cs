@@ -36,11 +36,11 @@
             // tbText
             // 
             this.tbText.AcceptsReturn = true;
-            this.tbText.Dock = System.Windows.Forms.DockStyle.Top;
             this.tbText.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbText.Location = new System.Drawing.Point(0, 0);
             this.tbText.Multiline = true;
             this.tbText.Name = "tbText";
+            this.tbText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.tbText.Size = new System.Drawing.Size(219, 203);
             this.tbText.TabIndex = 0;
             // 
@@ -74,6 +74,8 @@
             this.Controls.Add(this.tbText);
             this.Name = "TextForm";
             this.Text = "Text";
+            this.Load += new System.EventHandler(this.TextForm_Load);
+            this.Resize += new System.EventHandler(this.TextForm_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -81,8 +83,8 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnOK;
-        private System.Windows.Forms.Button btnCancel;
-        internal System.Windows.Forms.TextBox tbText;
+        public System.Windows.Forms.Button btnOK;
+        public System.Windows.Forms.Button btnCancel;
+        public System.Windows.Forms.TextBox tbText;
     }
 }

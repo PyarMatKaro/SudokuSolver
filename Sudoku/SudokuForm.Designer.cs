@@ -44,6 +44,7 @@ namespace Sudoku
             this.newJigsawGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.editBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.playToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pencilToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
@@ -62,7 +63,7 @@ namespace Sudoku
             this.selectForcedMovesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoSolveToolStripMenuItem = new Solver.HintSelectionsMenu();
             this.sudokuControl = new Sudoku.SudokuControl();
-            this.editBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.proofToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -187,33 +188,40 @@ namespace Sudoku
             // editToolStripMenuItem1
             // 
             this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            this.editToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.editToolStripMenuItem1.Size = new System.Drawing.Size(135, 22);
             this.editToolStripMenuItem1.Text = "Edit cell";
             this.editToolStripMenuItem1.Click += new System.EventHandler(this.editToolStripMenuItem1_Click);
+            // 
+            // editBoxToolStripMenuItem
+            // 
+            this.editBoxToolStripMenuItem.Name = "editBoxToolStripMenuItem";
+            this.editBoxToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
+            this.editBoxToolStripMenuItem.Text = "Edit box";
+            this.editBoxToolStripMenuItem.Click += new System.EventHandler(this.editBoxToolStripMenuItem_Click);
             // 
             // playToolStripMenuItem
             // 
             this.playToolStripMenuItem.Name = "playToolStripMenuItem";
-            this.playToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.playToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.playToolStripMenuItem.Text = "Play";
             this.playToolStripMenuItem.Click += new System.EventHandler(this.playToolStripMenuItem_Click);
             // 
             // pencilToolStripMenuItem
             // 
             this.pencilToolStripMenuItem.Name = "pencilToolStripMenuItem";
-            this.pencilToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.pencilToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.pencilToolStripMenuItem.Text = "Pencil";
             this.pencilToolStripMenuItem.Click += new System.EventHandler(this.pencilToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(132, 6);
             // 
             // restartPlayToolStripMenuItem
             // 
             this.restartPlayToolStripMenuItem.Name = "restartPlayToolStripMenuItem";
-            this.restartPlayToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.restartPlayToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.restartPlayToolStripMenuItem.Text = "Restart play";
             this.restartPlayToolStripMenuItem.Click += new System.EventHandler(this.restartPlayToolStripMenuItem_Click);
             // 
@@ -222,7 +230,8 @@ namespace Sudoku
             this.solverToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.resetToolStripMenuItem,
             this.solveLogicallyToolStripMenuItem,
-            this.solveWithBacktrackingToolStripMenuItem});
+            this.solveWithBacktrackingToolStripMenuItem,
+            this.proofToolStripMenuItem});
             this.solverToolStripMenuItem.Name = "solverToolStripMenuItem";
             this.solverToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
             this.solverToolStripMenuItem.Text = "Solver";
@@ -323,12 +332,12 @@ namespace Sudoku
             this.sudokuControl.Size = new System.Drawing.Size(378, 408);
             this.sudokuControl.TabIndex = 0;
             // 
-            // editBoxToolStripMenuItem
+            // proofToolStripMenuItem
             // 
-            this.editBoxToolStripMenuItem.Name = "editBoxToolStripMenuItem";
-            this.editBoxToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.editBoxToolStripMenuItem.Text = "Edit box";
-            this.editBoxToolStripMenuItem.Click += new System.EventHandler(this.editBoxToolStripMenuItem_Click);
+            this.proofToolStripMenuItem.Name = "proofToolStripMenuItem";
+            this.proofToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.proofToolStripMenuItem.Text = "Proof";
+            this.proofToolStripMenuItem.Click += new System.EventHandler(this.proofToolStripMenuItem_Click);
             // 
             // SudokuForm
             // 
@@ -386,5 +395,6 @@ namespace Sudoku
         private System.Windows.Forms.ToolStripMenuItem newKillerGridToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newJigsawGridToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editBoxToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem proofToolStripMenuItem;
     }
 }
