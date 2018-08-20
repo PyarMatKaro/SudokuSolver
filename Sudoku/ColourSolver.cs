@@ -24,6 +24,7 @@ namespace Sudoku
 
         public int[,] Solve(SudokuGrid grid, int[,] cages, int numCages)
         {
+            int Cells = grid.Cells;
             colourOfCage = new int[numCages];
             nb = new Dictionary<int, List<int>>();
             for (int ca = 0; ca < numCages; ++ca)
@@ -32,13 +33,13 @@ namespace Sudoku
             int[] dx = new int[] { -1, 0, 1, 0 };
             int[] dy = new int[] { 0, -1, 0, 1 };
             int numBorders = 0;
-            for (int x = 0; x < 9; x++)
-                for (int y = 0; y < 9; y++)
+            for (int x = 0; x < Cells; x++)
+                for (int y = 0; y < Cells; y++)
                     for (int d = 0; d < 4; ++d)
                     {
                         int x1 = x + dx[d];
                         int y1 = y + dy[d];
-                        if (x1 >= 0 && x1 < 9 && y1 >= 0 && y1 < 9)
+                        if (x1 >= 0 && x1 < Cells && y1 >= 0 && y1 < Cells)
                         {
                             int c1 = cages[x, y];
                             int c2 = cages[x1, y1];
@@ -99,9 +100,9 @@ namespace Sudoku
 
             if(!haveSolution)
                 return null;
-            int[,] ret = new int[9,9];
-            for (int x = 0; x < 9; x++)
-                for (int y = 0; y < 9; y++)
+            int[,] ret = new int[Cells, Cells];
+            for (int x = 0; x < Cells; x++)
+                for (int y = 0; y < Cells; y++)
                     ret[x, y] = colourOfCage[cages[x, y]];
             return ret;
         }

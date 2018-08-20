@@ -15,6 +15,7 @@ namespace Sudoku
         public readonly int selx, sely;
 
         public Dictionary<Point, Dictionary<int, Hint.Kind>> pencil = new Dictionary<Point, Dictionary<int, Hint.Kind>>();
+        public int Cells { get { return grid.Cells; } }
 
         public PaintContext(Graphics graphics, Size size, SudokuGrid grid, int selx, int sely)
             : base(size)
@@ -44,7 +45,7 @@ namespace Sudoku
                 for (int i = 0; i < ln.Length; ++i)
                 {
                     Brush br = ForegroundBrush(d[ln[i]]);
-                    DrawSubcell(br, p.X, p.Y, i + 9 - ln.Length, (ln[i] + 1).ToString());
+                    DrawSubcell(br, p.X, p.Y, i + Cells - ln.Length, (ln[i] + 1).ToString());
                 }
             }
         }
@@ -124,8 +125,8 @@ namespace Sudoku
 
         public void FillBox(int b, Brush back)
         {
-            for (int x = 0; x < 9; ++x)
-                for (int y = 0; y < 9; ++y)
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells; ++y)
                     if (grid.BoxAt(x, y) == b)
                         graphics.FillRectangle(back, new Rectangle(CellLocation(x, y), CellSize));
         }

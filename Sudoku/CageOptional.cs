@@ -18,8 +18,9 @@ namespace Sudoku
 
         static SudokuCandidate[] Filter(SudokuSolver ss, int cage, Func<int, bool> included)
         {
+            int Cells = ss.Cells;
             List<SudokuCandidate> toRemove = new List<SudokuCandidate>();
-            for (int i = 0; i < 9; ++i) if (!included(i + 1))
+            for (int i = 0; i < Cells; ++i) if (!included(i + 1))
                 {
                     CageOptional co = ss.GetCageOptional(cage, i);
                     if (co.Included)

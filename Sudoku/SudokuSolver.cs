@@ -13,12 +13,14 @@ namespace Sudoku
         private Candidate[] sampleSoln;
         protected SudokuRequirement[] ca;
         protected CageOptional[,] co;
+        public readonly int Cells;
 
         public SudokuSolver(SudokuGrid grid)
         {
+            Cells = grid.Cells;
             CreateMatrix(grid);
-            for (int x = 0; x < 9; ++x)
-                for (int y = 0; y < 9; ++y)
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells; ++y)
                     if (grid.FlagAt(x, y) != SudokuGrid.CellFlags.Free)
                         TrySelectCandidate(GetCandidate(x, y, grid.ValueAt(x, y)));
         }
@@ -32,9 +34,9 @@ namespace Sudoku
 
         protected void CreateOptionals(SudokuGrid grid, int nc)
         {
-            co = new CageOptional[nc, 9];
+            co = new CageOptional[nc, Cells];
             for (int i0 = 0; i0 < nc; ++i0)
-                for (int i1 = 0; i1 < 9; ++i1)
+                for (int i1 = 0; i1 < Cells; ++i1)
                     co[i0, i1] = new CageOptional(grid.cageInfo);
         }
 
@@ -84,12 +86,12 @@ namespace Sudoku
         public SudokuRequirement GetRequirement(int x, int y, Houses house)
         {
             int type = (int) house;
-            return ca[x + y * 9 + type * 9 * 9];
+            return ca[x + y * Cells + type * Cells * Cells];
         }
 
         SudokuRequirement GetDiagonalRequirement(int d, int n)
         {
-            return ca[ 9 * 9 * 4 + 9 * d + n];
+            return ca[Cells * Cells * 4 + Cells * d + n];
         }
 
         public CageOptional GetCageOptional(int cage, int n)
@@ -115,16 +117,16 @@ namespace Sudoku
             if (grid.MinorDiagonal)
                 ++diags;
             int d = grid.MajorDiagonal ? 1 : 0; // Where minor diagonal is found
-            CreateRequirements(9 * 9 * 4 + diags * 9);
+            CreateRequirements(Cells * Cells * 4 + diags * Cells);
             CreateOptionals(grid, num_cages);
             Houses[] houses = new Houses[]{
                 Houses.Cell,
                 Houses.Column,
                 Houses.Row,
                 Houses.Box};
-            for (int i0 = 0; i0 < 9; ++i0)
+            for (int i0 = 0; i0 < Cells; ++i0)
             {
-                for (int i1 = 0; i1 < 9; ++i1)
+                for (int i1 = 0; i1 < Cells; ++i1)
                 {
                     for (int type = 0; type < 4; ++type)
                     {
@@ -139,7 +141,7 @@ namespace Sudoku
             }
             if (grid.MajorDiagonal)
             {
-                for (int i0 = 0; i0 < 9; ++i0)
+                for (int i0 = 0; i0 < Cells; ++i0)
                 {
                     SudokuRequirement c = GetDiagonalRequirement(0, i0);
                     c.i0 = i0;
@@ -150,7 +152,7 @@ namespace Sudoku
             }
             if (grid.MinorDiagonal)
             {
-                for (int i0 = 0; i0 < 9; ++i0)
+                for (int i0 = 0; i0 < Cells; ++i0)
                 {
                     SudokuRequirement c = GetDiagonalRequirement(d, i0);
                     c.i0 = i0;
@@ -160,7 +162,7 @@ namespace Sudoku
                 }
             }
             for (int i0 = 0; i0 < num_cages; ++i0)
-                for (int i1 = 0; i1 < 9; ++i1)
+                for (int i1 = 0; i1 < Cells; ++i1)
                 {
                     CageOptional ca = GetCageOptional(i0, i1);
                     ca.i0 = i0;
@@ -171,15 +173,15 @@ namespace Sudoku
                 }
             
             // Create candidates - rows of 0/1 matrix
-            CreateCandidates(new SudokuCandidate[9 * 9 * 9]);
-            CreateSolution(9 * 9);
-            for (int x = 0; x < 9; ++x)
+            CreateCandidates(new SudokuCandidate[Cells * Cells * Cells]);
+            CreateSolution(Cells * Cells);
+            for (int x = 0; x < Cells; ++x)
             {
-                for (int y = 0; y < 9; ++y)
+                for (int y = 0; y < Cells; ++y)
                 {
                     int cage = grid.CageAt(x, y);
                     int box = grid.BoxAt(x, y);
-                    for (int n = 0; n < 9; ++n)
+                    for (int n = 0; n < Cells; ++n)
                     {
                         SudokuCandidate k = new SudokuCandidate(x, y, n, box, cage);
                         k.AddCandidate(GetRequirement(x, y, Houses.Cell));
@@ -212,12 +214,12 @@ namespace Sudoku
                 for (int ca = 0; ca < info.cages.Length; ++ca)
                 {
                     List<Point> pts = new List<Point>();
-                    for (int x = 0; x < 9; ++x)
-                        for (int y = 0; y < 8; ++y)
+                    for (int x = 0; x < Cells; ++x)
+                        for (int y = 0; y < Cells-1; ++y)
                             if (info.cages[x, y] == ca)
                                 pts.Add(new Point(x, y));
-                    int[] ns = new int[9];
-                    for (int i = 0; i < 9; ++i) ns[i] = i;
+                    int[] ns = new int[Cells];
+                    for (int i = 0; i < Cells; ++i) ns[i] = i;
                     Candidate k = new Candidate();
                     KillerRequire(k, info.totals[ca], pts.ToArray(), ns);
                 }
@@ -234,25 +236,25 @@ namespace Sudoku
 
         public Candidate GetCandidate(int x, int y, int n)
         {
-            return tr[n + y * 9 + x * 9 * 9];
+            return tr[n + y * Cells + x * Cells * Cells];
         }
 
         public string[] SolutionStrings()
         {
-            string[] ret = new string[9];
-            char[,] g = new char[9, 9];
-            for (int x = 0; x < 9; ++x)
-                for (int y = 0; y < 9; ++y)
+            string[] ret = new string[Cells];
+            char[,] g = new char[Cells, Cells];
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells; ++y)
                     g[x, y] = '.';
             for (int i = 0; i < tsc; ++i)
             {
                 SudokuCandidate sc = (SudokuCandidate)ts[i].Candidate;
                 g[sc.x, sc.y] = (char)('1' + sc.n);
             }
-            for (int y = 0; y < 9; ++y)
+            for (int y = 0; y < Cells; ++y)
             {
                 ret[y] = "";
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                     if (g[x, y] == '.')
                     {
                         ret[y]+="[";

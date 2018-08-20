@@ -58,34 +58,35 @@ namespace Sudoku
         public override void PaintForeground(HintPainter hp, Hint.Kind v)
         {
             PaintContext context = (PaintContext)hp;
+            int Cells = context.grid.Cells;
             if (house == Houses.Column)
             {
-                for (int y = 0; y < 9; ++y)
+                for (int y = 0; y < Cells; ++y)
                     if (context.grid.FlagAt(i0, y) == SudokuGrid.CellFlags.Free)
                         context.SetPencil(i0, y, i1, v);
             }
             else if (house == Houses.Row)
             {
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                     if (context.grid.FlagAt(x, i0) == SudokuGrid.CellFlags.Free)
                         context.SetPencil(x, i0,i1, v);
             }
             else if (house == Houses.Box)
             {
-                for (int x = 0; x < 9; ++x)
-                    for (int y = 0; y < 9; ++y)
+                for (int x = 0; x < Cells; ++x)
+                    for (int y = 0; y < Cells; ++y)
                         if (context.grid.FlagAt(x, y) == SudokuGrid.CellFlags.Free &&
                             context.grid.BoxAt(x, y) == i0)
                             context.SetPencil(x, y, i1, v);
             }
             else if (house == Houses.MajorDiagonal)
             {
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                     if (context.grid.FlagAt(x, x) == SudokuGrid.CellFlags.Free)
                         context.SetPencil(x, x, i0, v);
             }
             else if (house == Houses.MinorDiagonal)
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                     if (context.grid.FlagAt(x, 8 - x) == SudokuGrid.CellFlags.Free)
                         context.SetPencil(x, 8-x, i0, v);
         }
@@ -93,6 +94,7 @@ namespace Sudoku
         public override void PaintBackground(HintPainter hp, Hint.Kind v)
         {
             PaintContext context = (PaintContext)hp;
+            int Cells = context.grid.Cells;
             Brush back = PaintContext.BackgroundBrush(v);
             if (house == Houses.Cell)
                 context.FillCell(i0, i1, back);
@@ -103,10 +105,10 @@ namespace Sudoku
             else if (house == Houses.Box)
                 context.FillBox(i0, back);
             else if (house == Houses.MajorDiagonal)
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                     context.FillCell(x, x, back);
             else if (house == Houses.MinorDiagonal)
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                     context.FillCell(x, 8 - x, back);
         }
 

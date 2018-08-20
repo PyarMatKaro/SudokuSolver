@@ -13,6 +13,8 @@ namespace Sudoku
 {
     public partial class SudokuForm : Form, HintSupport
     {
+        int defCellA = 3;
+        int defCellB = 3;
 
         public SudokuForm()
         {
@@ -106,16 +108,21 @@ namespace Sudoku
             Grid.Updated();
         }
 
+        SudokuGrid.GridOptions CreateOptions()
+        {
+            return new SudokuGrid.GridOptions(defCellA, defCellB);
+        }
+
         private void newGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var options = new SudokuGrid.GridOptions();
+            var options = CreateOptions();
             Grid.ClearGrid(options);
             Grid.ResetSolver();
         }
 
         private void new1DiagonalGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var options = new SudokuGrid.GridOptions();
+            var options = CreateOptions();
             options.majorDiagonal = true;
             Grid.ClearGrid(options);
             Grid.ResetSolver();
@@ -123,7 +130,7 @@ namespace Sudoku
 
         private void new2DiagonalsGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var options = new SudokuGrid.GridOptions();
+            var options = CreateOptions();
             options.majorDiagonal = options.minorDiagonal = true;
             Grid.ClearGrid(options);
             Grid.ResetSolver();
@@ -262,7 +269,7 @@ namespace Sudoku
 
         private void newKillerGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var options = new SudokuGrid.GridOptions();
+            var options = CreateOptions();
             options.isKiller = true;
             Grid.ClearGrid(options);
             Grid.ResetSolver();
@@ -270,7 +277,7 @@ namespace Sudoku
 
         private void newJigsawGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var options = new SudokuGrid.GridOptions().DefaultColours();
+            var options = CreateOptions().DefaultColours();
             options.isJigsaw = true;
             Grid.ClearGrid(options);
             Grid.ResetSolver();

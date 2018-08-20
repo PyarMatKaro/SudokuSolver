@@ -17,6 +17,8 @@ namespace Sudoku
         //public const int FREE = 0;
         //public const int FIXED = 1;
         //public const int PLAY = 2;
+        public int CellA = 3, CellB = 3;
+        public int Cells { get { return CellA * CellB; } }
 
         public enum PlayModes { EditCell, EditBox, Play, Pencil };
         public PlayModes PlayMode;
@@ -32,26 +34,31 @@ namespace Sudoku
         {
             public bool majorDiagonal, minorDiagonal, isKiller, isJigsaw;
             public int[,] boxes, colours;
+            int cellA, cellB;
 
-            public GridOptions()
+            public GridOptions(int cellA, int cellB)
             {
+                this.cellA = cellA;
+                this.cellB = cellB;
                 DefaultBoxes();
             }
 
             GridOptions DefaultBoxes()
             {
-                boxes = new int[9, 9];
-                for (int x = 0; x < 9; ++x)
-                    for (int y = 0; y < 9; ++y)
-                        boxes[x, y] = DefaultBoxAt(x, y);
+                int Cells = cellA * cellB;
+                boxes = new int[Cells, Cells];
+                for (int x = 0; x < Cells; ++x)
+                    for (int y = 0; y < Cells; ++y)
+                        boxes[x, y] = DefaultBoxAt(x, y, cellA, cellB);
                 return this;
             }
 
             public GridOptions DefaultColours()
             {
-                colours = new int[9, 9];
-                for (int x = 0; x < 9; ++x)
-                    for (int y = 0; y < 9; ++y)
+                int Cells = cellA * cellB;
+                colours = new int[Cells, Cells];
+                for (int x = 0; x < Cells; ++x)
+                    for (int y = 0; y < Cells; ++y)
                         colours[x, y] = (x / 3 + y / 3) % 4;
                 return this;
             }
@@ -86,10 +93,11 @@ namespace Sudoku
             public int[,] cages;
             public int[] totals, sizes;
             public int[] remaining_totals, remaining_sizes;
+            public int Cells;
 
             public CageInfo()
             {
-                cages = new int[9, 9];
+                cages = new int[Cells, Cells];
             }
 
             public int NumCages { get { return totals.Length; } }
@@ -97,8 +105,8 @@ namespace Sudoku
             public void Reset()
             {
                 sizes = new int[NumCages];
-                for (int x = 0; x < 9; ++x)
-                    for (int y = 0; y < 9; ++y)
+                for (int x = 0; x < Cells; ++x)
+                    for (int y = 0; y < Cells; ++y)
                         ++sizes[cages[x, y]];
                 remaining_totals = new int[NumCages];
                 remaining_sizes = new int[NumCages];
@@ -151,9 +159,14 @@ namespace Sudoku
             ClearGrid(gridOptions);
         }
 
-        public static int DefaultBoxAt(int x, int y)
+        public int DefaultBoxAt(int x, int y)
         {
-            return (x / 3) + (y / 3) * 3;
+            return DefaultBoxAt(x, y, CellA, CellB);
+        }
+
+        public static int DefaultBoxAt(int x, int y, int cellA, int cellB)
+        {
+            return (x / cellA) + (y / cellB) * cellA;
         }
 
         public int BoxAt(int x, int y)
@@ -182,10 +195,10 @@ namespace Sudoku
         {
             this.cageInfo = null;
             this.gridOptions = options;
-            values = new int[9, 9];
-            flags = new CellFlags[9, 9];
-            for (int x = 0; x < 9; ++x)
-                for (int y = 0; y < 9; ++y)
+            values = new int[Cells, Cells];
+            flags = new CellFlags[Cells, Cells];
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells; ++y)
                 {
                     values[x, y] = -1;
                     flags[x, y] = CellFlags.Free;
@@ -206,8 +219,8 @@ namespace Sudoku
             get
             {
                 return gridOptions.isJigsaw;
-                //for (int x = 0; x < 9; ++x)
-                //    for (int y = 0; y < 9; ++y)
+                //for (int x = 0; x < Cells; ++x)
+                //    for (int y = 0; y < Cells; ++y)
                 //        if (boxes[x, y] != DefaultBoxAt(x, y))
                 //            return true;
                 //return false;
@@ -232,12 +245,12 @@ namespace Sudoku
 
         void PaintCages(PaintContext context, Pen thick)
         {
-            for (int x = 0; x < 8; ++x)
-                for (int y = 0; y < 9; ++y)
+            for (int x = 0; x < Cells-1; ++x)
+                for (int y = 0; y < Cells; ++y)
                     if (CageAt(x, y) != CageAt(x + 1, y))
                         context.DrawVerticalLine(x, y, thick);
-            for (int x = 0; x < 9; ++x)
-                for (int y = 0; y < 8; ++y)
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells-1; ++y)
                     if (CageAt(x, y) != CageAt(x, y + 1))
                         context.DrawHorizontalLine(x, y, thick);
         }
@@ -264,8 +277,8 @@ namespace Sudoku
                 Brush[] cage_brushes = new Brush[4];
                 for (int i = 0; i < 4; ++i)
                     cage_brushes[i] = new SolidBrush(cage_colours[i]);
-                for (int x = 0; x < 9; ++x)
-                    for (int y = 0; y < 9; ++y)
+                for (int x = 0; x < Cells; ++x)
+                    for (int y = 0; y < Cells; ++y)
                         context.FillCell(x, y, cage_brushes[gridOptions.colours[x, y]]);
                 for (int i = 0; i < 4; ++i)
                     cage_brushes[i].Dispose();
@@ -274,11 +287,11 @@ namespace Sudoku
             // Diagonals - brush  previously Brushes.LightGray
             if (MajorDiagonal)
                 using (Brush br = new HatchBrush(HatchStyle.ForwardDiagonal, Color.DarkGray, Color.Transparent))
-                    for (int x = 0; x < 9; ++x)
+                    for (int x = 0; x < Cells; ++x)
                         context.FillCell(x, x, br);
             if (MinorDiagonal)
                 using (Brush br = new HatchBrush(HatchStyle.BackwardDiagonal, Color.DarkGray, Color.Transparent))
-                    for (int x = 0; x < 9; ++x)
+                    for (int x = 0; x < Cells; ++x)
                         context.FillCell(x, 8 - x, br);
 
             // Cage totals
@@ -306,8 +319,8 @@ namespace Sudoku
 
             // Grid
             Dictionary<int, int> bs = new Dictionary<int, int>();
-            for (int x = 0; x < 9; ++x)
-                for (int y = 0; y < 9; ++y)
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells; ++y)
                 {
                     int b = BoxAt(x, y);
                     if (bs.ContainsKey(b))
@@ -320,7 +333,7 @@ namespace Sudoku
                 int b0 = BoxAt(x0, y0), b1 = BoxAt(x1, y1);
                 if (b0 == b1)
                     return 0;
-                if (bs[b0] < 9 || bs[b1] < 9)
+                if (bs[b0] < Cells || bs[b1] < Cells)
                     return 2;
                 return 1;
             };
@@ -328,18 +341,18 @@ namespace Sudoku
             using (Pen wrong = new Pen(Color.Red, 3.0f))
             {
                 Pen[] pens = { Pens.Black, thick, wrong };
-                for (int x = 0; x < 8; ++x)
-                    for (int y = 0; y < 9; ++y)
+                for (int x = 0; x < Cells-1; ++x)
+                    for (int y = 0; y < Cells; ++y)
                         context.DrawVerticalLine(x, y, pens[border(x, y, x + 1, y)]);
-                for (int x = 0; x < 9; ++x)
-                    for (int y = 0; y < 8; ++y)
+                for (int x = 0; x < Cells; ++x)
+                    for (int y = 0; y < Cells-1; ++y)
                         context.DrawHorizontalLine(x, y, pens[border(x, y, x, y + 1)]);
             }
 
             // Givens
             {
-                for (int x = 0; x < 9; ++x)
-                    for (int y = 0; y < 9; ++y)
+                for (int x = 0; x < Cells; ++x)
+                    for (int y = 0; y < Cells; ++y)
                         if (flags[x, y] == CellFlags.Fixed)
                             context.DrawCell(Brushes.Black, x, y, values[x, y]);
                         else if (flags[x, y] == CellFlags.Play)
@@ -521,8 +534,8 @@ namespace Sudoku
         {
             if (cageInfo != null)
                 cageInfo.Reset();
-            for(int x=0;x<9;x++)
-                for(int y=0;y<9;y++)
+            for (int x = 0; x < Cells; x++)
+                for (int y = 0; y < Cells; y++)
                     if (FlagAt(x, y) == CellFlags.Solved)
                     {
                         flags[x, y] = CellFlags.Free;
@@ -656,10 +669,10 @@ namespace Sudoku
 
         public string[] GridStringsCompact()
         {
-            string[] s = new string[9];
-            for (int y = 0; y < 9; ++y)
+            string[] s = new string[Cells];
+            for (int y = 0; y < Cells; ++y)
             {
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                     if (flags[x, y] == CellFlags.Fixed)
                         s[y] += (char)('1' + values[x, y]);
                     else
@@ -686,11 +699,11 @@ namespace Sudoku
                 char lc = 'a';
                 List<string> ret = new List<string>();
                 gridOptions.AddDiagonalsLine(ret);
-                for (int y = 0; y < 9; ++y)
+                for (int y = 0; y < Cells; ++y)
                 {
                     string lcl = "";
                     string gs = "";
-                    for (int x = 0; x < 9; ++x)
+                    for (int x = 0; x < Cells; ++x)
                     {
                         int ca = cageInfo.cages[x, y];
                         char c;
@@ -725,10 +738,10 @@ namespace Sudoku
             {
                 List<string> l = new List<string>();
                 gridOptions.AddDiagonalsLine(l);
-                for (int y = 0; y < 9; ++y)
+                for (int y = 0; y < Cells; ++y)
                 {
                     string s = "";
-                    for (int x = 0; x < 9; ++x)
+                    for (int x = 0; x < Cells; ++x)
                     {
                         s += (char)('a' + gridOptions.boxes[x, y]);
                         if (flags[x, y] == CellFlags.Fixed)
@@ -748,10 +761,10 @@ namespace Sudoku
             {
                 List<string> l = new List<string>();
                 gridOptions.AddDiagonalsLine(l);
-                for (int y = 0; y < 9; ++y)
+                for (int y = 0; y < Cells; ++y)
                 {
                     string s = " ";
-                    for (int x = 0; x < 9; ++x)
+                    for (int x = 0; x < Cells; ++x)
                     {
                         if (flags[x, y] == CellFlags.Fixed)
                             s += (char)('1' + values[x, y]);
@@ -798,7 +811,7 @@ namespace Sudoku
                 string s = a[i];
                 if (s.Length == 81)
                 {
-                    GridOptions options = new GridOptions();
+                    GridOptions options = new GridOptions(3, 3);
                     ClearGrid(options);
                     for (int y = 0; y < 9; ++y)
                         for (int x = 0; x < 9; ++x)
@@ -819,9 +832,20 @@ namespace Sudoku
 
         public bool SetGridStrings9x9(string[] a)
         {
-            GridOptions options = new GridOptions();
+            int cellA = 3, cellB = 3;
+            int i = 0;
+            if (a.Length < 1)
+                return false;
+            string[] os = a[0].Split(',');
+            if (os.Length >= 2)
+            {
+                cellA = int.Parse(os[0]);
+                cellB = int.Parse(os[1]);
+                ++i;
+            }
+            GridOptions options = new GridOptions(cellA, cellB);
             List<string> l = new List<string>();
-            for (int y = 0; y < a.Length; ++y)
+            for (int y = i; y < a.Length; ++y)
             {
                 if (!options.CheckDiagonalsLine(a[y].ToUpperInvariant()))
                 {
@@ -829,22 +853,22 @@ namespace Sudoku
                     for (int x = 0; x < a[y].Length; ++x)
                     {
                         char c = a[y][x];
-                        if (c == '.' || c >= '1' && c <= '9')
+                        if (c == '.' || c >= '1' && c <= '0' + (cellA*cellB))
                             s += c;
                     }
-                    if (s.Length == 9)
+                    if (s.Length == Cells)
                         l.Add(s);
                 }
             }
             a = l.ToArray();
-            if (a.Length != 9)
+            if (a.Length != Cells)
                 return false;
             ClearGrid(options);
-            for (int y = 0; y < 9; ++y)
-                for (int x = 0; x < 9; ++x)
+            for (int y = 0; y < Cells; ++y)
+                for (int x = 0; x < Cells; ++x)
                 {
                     char c = a[y][x];
-                    if (c >= '1' && c <= '9')
+                    if (c >= '1' && c <= '0' + Cells)
                     {
                         values[x, y] = c - '1';
                         flags[x, y] = CellFlags.Fixed;
@@ -856,10 +880,21 @@ namespace Sudoku
 
         public bool SetGridStrings9x9Killer(string[] a0)
         {
-            GridOptions options = new GridOptions();
+            int i = 0;
+            if (a0.Length < 1)
+                return false;
+            string[] os = a0[0].Split(',');
+            int cellA = 3, cellB = 3;
+            if(os.Length>=2)
+            {
+                cellA = int.Parse(os[0]);
+                cellB = int.Parse(os[1]);
+                ++i;
+            }
+
+            GridOptions options = new GridOptions(cellA, cellB);
             options.isKiller = true;
             List<string> l = new List<string>();
-            int i=0;
             if (options.CheckDiagonalsLine(a0[i]))
                 i++;
             ClearGrid(options);
@@ -869,27 +904,28 @@ namespace Sudoku
             {
                 string[] a = a0[i].Split(' ');
                 foreach (string s in a)
-                    if (s.Length == 9)
+                    if (s.Length == Cells)
                         aLine.Add(s);
                     else if (s.Length > 2 && s[1] == '=')
                         aSum.Add(s);
                     else if (s.Length > 0)
                         return false;
             }
-            if (aLine.Count != 9)
+            if (aLine.Count != Cells)
                 return false;
             cageInfo = new CageInfo();
+            cageInfo.Cells = Cells;
             Dictionary<char, int> names = new Dictionary<char, int>();
             Dictionary<int, int> totals = new Dictionary<int, int>();
             int num_cages = 0;
-            for (int y = 0; y < 9; ++y)
+            for (int y = 0; y < Cells; ++y)
             {
                 string s = aLine[y];
-                for (int x = 0; x < 9; ++x)
+                for (int x = 0; x < Cells; ++x)
                 {
                     int this_cage;
                     char c = s[x];
-                    if (c >= '1' && c <= '9')
+                    if (c >= '1' && c <= '0' + Cells)
                     {
                         this_cage = num_cages++;
                         totals[this_cage] = c - '0';
@@ -934,8 +970,8 @@ namespace Sudoku
 
             cageInfo.Reset();
             /*
-            for (int y = 0; y < 9; ++y)
-                for (int x = 0; x < 9; ++x)
+            for (int y = 0; y < Cells; ++y)
+                for (int x = 0; x < Cells; ++x)
                 {
                     int cage = cageInfo.cages[x, y];
                     if (cageInfo.sizes[cage] == 1)
@@ -952,11 +988,23 @@ namespace Sudoku
 
         public bool SetGridStrings9x9Jigsaw(string[] a)
         {
+            int i = 0;
+            if (a.Length < 1)
+                return false;
+            string[] os = a[0].Split(',');
+            int cellA = 3, cellB = 3;
+            if (os.Length >= 2)
+            {
+                cellA = int.Parse(os[0]);
+                cellB = int.Parse(os[1]);
+                ++i;
+            }
+
+            GridOptions options = new GridOptions(cellA, cellB);
             List<string> l = new List<string>();
-            GridOptions options = new GridOptions();
             options.isJigsaw = true;
-            options.boxes = new int[9, 9];
-            for (int y = 0; y < a.Length; ++y)
+            options.boxes = new int[Cells, Cells];
+            for (int y = i; y < a.Length; ++y)
             {
                 if(!options.CheckDiagonalsLine(a[y].ToUpperInvariant()))
                 {
@@ -970,7 +1018,7 @@ namespace Sudoku
                             char c = a[y][x];
                             if (c == '0')
                                 c = '.';
-                            if (c == '.' || c >= '1' && c <= '9')
+                            if (c == '.' || c >= '1' && c <= '0' + Cells)
                             {
                                 s += b;
                                 s += c;
@@ -982,15 +1030,15 @@ namespace Sudoku
                 }
             }
             a = l.ToArray();
-            if (a.Length != 9)
+            if (a.Length != Cells)
                 return false;
             ClearGrid(options);
-            for (int y = 0; y < 9; ++y)
-                for (int x = 0; x < 9; ++x)
+            for (int y = 0; y < Cells; ++y)
+                for (int x = 0; x < Cells; ++x)
                 {
                     char b = a[y][x * 2];
                     char c = a[y][x * 2 + 1];
-                    if (c >= '1' && c <= '9')
+                    if (c >= '1' && c <= '0' + Cells)
                     {
                         values[x, y] = c - '1';
                         flags[x, y] = CellFlags.Fixed;
@@ -1004,7 +1052,7 @@ namespace Sudoku
                 }
 
             ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, gridOptions.boxes, 9);
+            gridOptions.colours = cs.Solve(this, gridOptions.boxes, Cells);
             ResetSolver();
             return true;
         }
@@ -1012,20 +1060,20 @@ namespace Sudoku
         public bool SetGridStrings81Jigsaw(string[] a)
         {
             // format used at www.icosahedral.net
-            string[] a2 = (from string line in a where line.Length == 81 select line).ToArray();
+            string[] a2 = (from string line in a where line.Length == Cells * Cells select line).ToArray();
             if (a2.Length != 2)
                 return false;
-            GridOptions options = new GridOptions();
+            GridOptions options = new GridOptions(3, 3);
             options.isJigsaw = true;
             ClearGrid(options);
-            gridOptions.boxes = new int[9, 9];
-            for (int i = 0; i < 81; ++i)
+            gridOptions.boxes = new int[Cells, Cells];
+            for (int i = 0; i < Cells * Cells; ++i)
             {
-                int x = i % 9;
-                int y = i / 9;
+                int x = i % Cells;
+                int y = i / Cells;
                 char c = a2[0][i];
                 char b = a2[1][i];
-                if (c >= '0' && c <= '8')
+                if (c >= '0' && c <= '0' + Cells)
                 {
                     values[x, y] = c - '0';
                     flags[x, y] = CellFlags.Fixed;
@@ -1042,15 +1090,15 @@ namespace Sudoku
             }
 
             ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, gridOptions.boxes, 9);
+            gridOptions.colours = cs.Solve(this, gridOptions.boxes, Cells);
             ResetSolver();
             return true;
         }
 
         public void ClearEntries()
         {
-            for(int x=0;x<9;++x)
-                for (int y = 0; y < 9; ++y)
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells; ++y)
                 {
                     CellFlags cf = FlagAt(x, y);
                     if (cf == CellFlags.Play || cf == CellFlags.Solved)
@@ -1069,7 +1117,7 @@ namespace Sudoku
             Candidate[] soln = solver.RandomSolution();
             if (soln == null)
                 return;
-            int[,] ans = new int[9, 9];
+            int[,] ans = new int[Cells, Cells];
             foreach (Candidate k in soln)
             {
                 SudokuCandidate sc = (SudokuCandidate)k;
@@ -1082,8 +1130,8 @@ namespace Sudoku
                 SolveResult sr = solver.DoLogicalSolve(this, hints);
                 if (sr == SolveResult.SingleSolution)
                     break;
-                int x = Utils.Utils.Rnd(9);
-                int y = Utils.Utils.Rnd(9);
+                int x = Utils.Utils.Rnd(Cells);
+                int y = Utils.Utils.Rnd(Cells);
                 if (sr == SolveResult.NoSolutions)
                 {
                     ClearCell(x, y);
@@ -1096,8 +1144,8 @@ namespace Sudoku
                 }
             }
             // Remove any clues where it remains soluable
-            for (int x = 0; x < 9; ++x)
-                for (int y = 0; y < 9; ++y)
+            for (int x = 0; x < Cells; ++x)
+                for (int y = 0; y < Cells; ++y)
                 {
                     ClearCell(x, y);
                     if (solver.DoLogicalSolve(this, hints) != SolveResult.SingleSolution)
@@ -1106,11 +1154,11 @@ namespace Sudoku
             ResetSolver();
         }
 
-        public static IEnumerable<Tuple<int,int>> Neighbours(int x, int y)
+        public IEnumerable<Tuple<int,int>> Neighbours(int x, int y)
         {
             for (int dx = -1; dx <= 1; ++dx)
                 for (int dy = -1; dy <= 1; ++dy)
-                    if ((dx != 0 || dy != 0) && (dx == 0 || dy == 0) && x + dx >= 0 && y + dy >= 0 && x + dx < 9 && y + dy < 9)
+                    if ((dx != 0 || dy != 0) && (dx == 0 || dy == 0) && x + dx >= 0 && y + dy >= 0 && x + dx < Cells && y + dy < Cells)
                         yield return new Tuple<int, int>(x + dx, y + dy);
         }
 
@@ -1124,7 +1172,7 @@ namespace Sudoku
             int i = bs.IndexOf(gridOptions.boxes[x, y]);
             gridOptions.boxes[x, y] = bs[i == bs.Count - 1 ? 0 : i + 1];
             ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, gridOptions.boxes, 9);
+            gridOptions.colours = cs.Solve(this, gridOptions.boxes, Cells);
         }
     }
 }

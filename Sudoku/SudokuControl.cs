@@ -12,7 +12,6 @@ namespace Sudoku
 {
     public partial class SudokuControl : UserControl, UpdateListener
     {
-
         SudokuGrid grid;
         int selx = -1, sely = -1;
 
@@ -23,6 +22,7 @@ namespace Sudoku
         }
 
         public bool HasSelection { get { return (selx != -1 && sely != -1); } }
+        public int Cells { get { return grid.Cells; } }
 
         public SudokuGrid Grid
         {
@@ -38,7 +38,7 @@ namespace Sudoku
 
                 // Keep form designer happy
                 if (grid == null)
-                    grid = new SudokuGrid(new SudokuGrid.GridOptions());
+                    grid = new SudokuGrid(new SudokuGrid.GridOptions(3, 3));
 
                 using (PaintContext context = new PaintContext(e.Graphics, Size, grid, selx, sely))
                 {
@@ -57,7 +57,7 @@ namespace Sudoku
             Size cs = context.CellSize;
             int x = e.X / cs.Width;
             int y = e.Y / cs.Height;
-            if (x < 0 || x >= 9 || y < 0 || y >= 9)
+            if (x < 0 || x >= Cells || y < 0 || y >= Cells)
                 return;
             if (grid.PlayMode == SudokuGrid.PlayModes.EditBox)
             {
@@ -80,11 +80,11 @@ namespace Sudoku
                 return;
             Invalidate();
             selx++;
-            if (selx != 9)
+            if (selx != Cells)
                 return;
             selx = 0;
             sely++;
-            if (sely != 9)
+            if (sely != Cells)
                 return;
             sely = 0;
         }
@@ -94,7 +94,7 @@ namespace Sudoku
             if (!HasSelection)
                 return;
             int nx = selx + dx, ny = sely + dy;
-            if (nx < 0 || nx >= 9 || ny < 0 || ny >= 9)
+            if (nx < 0 || nx >= Cells || ny < 0 || ny >= Cells)
                 return;
             selx += dx;
             sely += dy;
@@ -265,7 +265,7 @@ namespace Sudoku
             Size cs = context.CellSize;
             int x = e.X / cs.Width;
             int y = e.Y / cs.Height;
-            if (x < 0 || x >= 9 || y < 0 || y >= 9)
+            if (x < 0 || x >= Cells || y < 0 || y >= Cells)
             {
                 toolTipText = null;
                 toolTip1.Active = false;
