@@ -32,6 +32,8 @@ namespace Sudoku
         HintOptions hintOptions = new HintOptions();
         Hint[] paintedHints = new Hint[0];
 
+        public char ToChar(int i) { return gridOptions.ToChar(i); }
+
         public class GridOptions
         {
             public bool majorDiagonal, minorDiagonal, isKiller, isJigsaw;

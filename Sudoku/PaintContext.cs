@@ -45,7 +45,7 @@ namespace Sudoku
                 for (int i = 0; i < ln.Length; ++i)
                 {
                     Brush br = ForegroundBrush(d[ln[i]]);
-                    DrawSubcell(br, p.X, p.Y, i + Cells - ln.Length, (ln[i] + 1).ToString());
+                    DrawSubcell(br, p.X, p.Y, i + Cells - ln.Length, grid.ToChar(ln[i]).ToString());
                 }
             }
         }
@@ -135,14 +135,14 @@ namespace Sudoku
         {
             Size csz = CellSize;
             Point p = CellLocation(x, y);
-            string s = (n + 1).ToString();
+            string s = grid.ToChar(n).ToString();
             SizeF sz = graphics.MeasureString(s, LargeFont);
             graphics.DrawString(s, LargeFont, br, p.X + (csz.Width - sz.Width) / 2, p.Y + (csz.Height - sz.Height) / 2);
         }
 
         public void DrawSubcell(Brush br, int x, int y, int n)
         {
-            DrawSubcell(br,x,y,n,(n+1).ToString());
+            DrawSubcell(br,x,y,n,grid.ToChar(n).ToString());
         }
 
         public void DrawSubcell(Brush br, int x, int y, int n, string s)

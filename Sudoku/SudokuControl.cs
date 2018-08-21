@@ -151,6 +151,14 @@ namespace Sudoku
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
+            char kc = char.ToUpperInvariant((char)e.KeyValue);
+            if (kc >= grid.Start && kc <= grid.Start + grid.Cells)
+            {
+                HandleNumber(kc - grid.Start);
+                e.Handled = true;
+                return;
+            }
+
             switch (e.KeyData)
             {
                 case Keys.Space:
@@ -184,18 +192,6 @@ namespace Sudoku
                     Grid.RequestHint();
                     SelectForcedHint();
                     Invalidate();
-                    break;
-
-                case Keys.D1:
-                case Keys.D2:
-                case Keys.D3:
-                case Keys.D4:
-                case Keys.D5:
-                case Keys.D6:
-                case Keys.D7:
-                case Keys.D8:
-                case Keys.D9:
-                    HandleNumber(e.KeyData - Keys.D1);
                     break;
 
                 default:
