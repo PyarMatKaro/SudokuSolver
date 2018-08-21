@@ -30,7 +30,7 @@ namespace Sudoku
             if (house == Houses.MajorDiagonal)
                 return x == y;
             if (house == Houses.MinorDiagonal)
-                return x == 8 - y;
+                return x == grid.Cells - y - 1;
             if (house == Houses.Cage)
                 return grid.CageAt(x, y) == i0;
             return false;
@@ -69,7 +69,7 @@ namespace Sudoku
             {
                 for (int x = 0; x < Cells; ++x)
                     if (context.grid.FlagAt(x, i0) == SudokuGrid.CellFlags.Free)
-                        context.SetPencil(x, i0,i1, v);
+                        context.SetPencil(x, i0, i1, v);
             }
             else if (house == Houses.Box)
             {
@@ -87,8 +87,8 @@ namespace Sudoku
             }
             else if (house == Houses.MinorDiagonal)
                 for (int x = 0; x < Cells; ++x)
-                    if (context.grid.FlagAt(x, 8 - x) == SudokuGrid.CellFlags.Free)
-                        context.SetPencil(x, 8-x, i0, v);
+                    if (context.grid.FlagAt(x, Cells - x - 1) == SudokuGrid.CellFlags.Free)
+                        context.SetPencil(x, Cells - x - 1, i0, v);
         }
 
         public override void PaintBackground(HintPainter hp, Hint.Kind v)
@@ -109,7 +109,7 @@ namespace Sudoku
                     context.FillCell(x, x, back);
             else if (house == Houses.MinorDiagonal)
                 for (int x = 0; x < Cells; ++x)
-                    context.FillCell(x, 8 - x, back);
+                    context.FillCell(x, Cells - x - 1, back);
         }
 
     }

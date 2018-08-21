@@ -44,9 +44,7 @@ namespace Sudoku
             public bool FromChar(char c, out int i)
             {
                 i = -1;
-                if (c == '.')
-                    i = 0;
-                else if (c >= start && c < start + Cells)
+                if (c != '.' && c >= start && c < start + Cells)
                     i = c - start;
                 else
                     return false;
@@ -55,7 +53,7 @@ namespace Sudoku
 
             public char ToChar(int i)
             {
-                if (i == 0)
+                if (i == -1)
                     return '.';
                 return (char)(start + i);
             }
@@ -318,7 +316,7 @@ namespace Sudoku
             if (MinorDiagonal)
                 using (Brush br = new HatchBrush(HatchStyle.BackwardDiagonal, Color.DarkGray, Color.Transparent))
                     for (int x = 0; x < Cells; ++x)
-                        context.FillCell(x, 8 - x, br);
+                        context.FillCell(x, Cells - x - 1, br);
 
             // Cage totals
             if (IsKiller)

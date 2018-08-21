@@ -190,7 +190,7 @@ namespace Sudoku
                         k.AddCandidate(GetRequirement(box, n, Houses.Box));
                         if (grid.MajorDiagonal && x == y)
                             k.AddCandidate(GetDiagonalRequirement(0, n));
-                        if (grid.MinorDiagonal && x == 8 - y)
+                        if (grid.MinorDiagonal && x == Cells - y - 1)
                             k.AddCandidate(GetDiagonalRequirement(d, n));
                         if (cage != -1)
                             k.AddCageOptional(GetCageOptional(cage, n));
