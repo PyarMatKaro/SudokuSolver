@@ -18,7 +18,7 @@ namespace Sudoku
         public int Cells { get { return grid.Cells; } }
 
         public PaintContext(Graphics graphics, Size size, SudokuGrid grid, int selx, int sely)
-            : base(size)
+            : base(size, grid.Cells)
         {
             this.grid = grid;
             this.graphics = graphics;

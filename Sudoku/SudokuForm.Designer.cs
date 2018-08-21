@@ -37,7 +37,8 @@ namespace Sudoku
             this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.solutionAsTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.newGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newGridMenuItem_16x16 = new System.Windows.Forms.ToolStripMenuItem();
+            this.newGridMenuItem_9x9 = new System.Windows.Forms.ToolStripMenuItem();
             this.new1DiagonalGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.new2DiagonalsGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newKillerGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,6 +54,7 @@ namespace Sudoku
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.solveLogicallyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.solveWithBacktrackingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.proofToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,7 +65,9 @@ namespace Sudoku
             this.selectForcedMovesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoSolveToolStripMenuItem = new Solver.HintSelectionsMenu();
             this.sudokuControl = new Sudoku.SudokuControl();
-            this.proofToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newGridMenuItem_8x8 = new System.Windows.Forms.ToolStripMenuItem();
+            this.newGridMenuItem_6x6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.newGridMenuItem_4x4 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -90,7 +94,11 @@ namespace Sudoku
             this.textToolStripMenuItem,
             this.solutionAsTextToolStripMenuItem,
             this.toolStripMenuItem2,
-            this.newGridToolStripMenuItem,
+            this.newGridMenuItem_4x4,
+            this.newGridMenuItem_6x6,
+            this.newGridMenuItem_8x8,
+            this.newGridMenuItem_9x9,
+            this.newGridMenuItem_16x16,
             this.new1DiagonalGridToolStripMenuItem,
             this.new2DiagonalsGridToolStripMenuItem,
             this.newKillerGridToolStripMenuItem,
@@ -137,12 +145,19 @@ namespace Sudoku
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(208, 6);
             // 
-            // newGridToolStripMenuItem
+            // newGridMenuItem_16x16
             // 
-            this.newGridToolStripMenuItem.Name = "newGridToolStripMenuItem";
-            this.newGridToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
-            this.newGridToolStripMenuItem.Text = "New grid";
-            this.newGridToolStripMenuItem.Click += new System.EventHandler(this.newGridToolStripMenuItem_Click);
+            this.newGridMenuItem_16x16.Name = "newGridMenuItem_16x16";
+            this.newGridMenuItem_16x16.Size = new System.Drawing.Size(211, 22);
+            this.newGridMenuItem_16x16.Text = "New 16x16 grid";
+            this.newGridMenuItem_16x16.Click += new System.EventHandler(this.newGridMenuItem_16x16_Click);
+            // 
+            // newGridMenuItem_9x9
+            // 
+            this.newGridMenuItem_9x9.Name = "newGridMenuItem_9x9";
+            this.newGridMenuItem_9x9.Size = new System.Drawing.Size(211, 22);
+            this.newGridMenuItem_9x9.Text = "New 9x9 grid";
+            this.newGridMenuItem_9x9.Click += new System.EventHandler(this.newGridMenuItem_9x9_Click);
             // 
             // new1DiagonalGridToolStripMenuItem
             // 
@@ -257,6 +272,13 @@ namespace Sudoku
             this.solveWithBacktrackingToolStripMenuItem.Text = "Solve with backtracking";
             this.solveWithBacktrackingToolStripMenuItem.Click += new System.EventHandler(this.solveWithBacktrackingToolStripMenuItem_Click);
             // 
+            // proofToolStripMenuItem
+            // 
+            this.proofToolStripMenuItem.Name = "proofToolStripMenuItem";
+            this.proofToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.proofToolStripMenuItem.Text = "Proof";
+            this.proofToolStripMenuItem.Click += new System.EventHandler(this.proofToolStripMenuItem_Click);
+            // 
             // generatorToolStripMenuItem
             // 
             this.generatorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -332,12 +354,26 @@ namespace Sudoku
             this.sudokuControl.Size = new System.Drawing.Size(378, 408);
             this.sudokuControl.TabIndex = 0;
             // 
-            // proofToolStripMenuItem
+            // newGridMenuItem_8x8
             // 
-            this.proofToolStripMenuItem.Name = "proofToolStripMenuItem";
-            this.proofToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.proofToolStripMenuItem.Text = "Proof";
-            this.proofToolStripMenuItem.Click += new System.EventHandler(this.proofToolStripMenuItem_Click);
+            this.newGridMenuItem_8x8.Name = "newGridMenuItem_8x8";
+            this.newGridMenuItem_8x8.Size = new System.Drawing.Size(211, 22);
+            this.newGridMenuItem_8x8.Text = "New 8x8 grid";
+            this.newGridMenuItem_8x8.Click += new System.EventHandler(this.newGridMenuItem_8x8_Click);
+            // 
+            // newGridMenuItem_6x6
+            // 
+            this.newGridMenuItem_6x6.Name = "newGridMenuItem_6x6";
+            this.newGridMenuItem_6x6.Size = new System.Drawing.Size(211, 22);
+            this.newGridMenuItem_6x6.Text = "New 6x6 grid";
+            this.newGridMenuItem_6x6.Click += new System.EventHandler(this.newGridMenuItem_6x6_Click);
+            // 
+            // newGridMenuItem_4x4
+            // 
+            this.newGridMenuItem_4x4.Name = "newGridMenuItem_4x4";
+            this.newGridMenuItem_4x4.Size = new System.Drawing.Size(211, 22);
+            this.newGridMenuItem_4x4.Text = "New 4x4 grid";
+            this.newGridMenuItem_4x4.Click += new System.EventHandler(this.newGridMenuItem_4x4_Click);
             // 
             // SudokuForm
             // 
@@ -375,7 +411,7 @@ namespace Sudoku
         private System.Windows.Forms.ToolStripMenuItem textToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem newGridToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newGridMenuItem_16x16;
         private System.Windows.Forms.ToolStripMenuItem new1DiagonalGridToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem new2DiagonalsGridToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem solveLogicallyToolStripMenuItem;
@@ -396,5 +432,9 @@ namespace Sudoku
         private System.Windows.Forms.ToolStripMenuItem newJigsawGridToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editBoxToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem proofToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newGridMenuItem_9x9;
+        private System.Windows.Forms.ToolStripMenuItem newGridMenuItem_4x4;
+        private System.Windows.Forms.ToolStripMenuItem newGridMenuItem_6x6;
+        private System.Windows.Forms.ToolStripMenuItem newGridMenuItem_8x8;
     }
 }

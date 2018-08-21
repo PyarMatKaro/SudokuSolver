@@ -38,7 +38,7 @@ namespace Sudoku
 
                 // Keep form designer happy
                 if (grid == null)
-                    grid = new SudokuGrid(new SudokuGrid.GridOptions(3, 3));
+                    grid = new SudokuGrid(new SudokuGrid.GridOptions(3, 3, '1'));
 
                 using (PaintContext context = new PaintContext(e.Graphics, Size, grid, selx, sely))
                 {
@@ -53,7 +53,7 @@ namespace Sudoku
 
         private void SudokuControl_MouseClick(object sender, MouseEventArgs e)
         {
-            PickContext context = new PickContext(ClientSize);
+            PickContext context = new PickContext(ClientSize, Cells);
             Size cs = context.CellSize;
             int x = e.X / cs.Width;
             int y = e.Y / cs.Height;
@@ -261,7 +261,7 @@ namespace Sudoku
 
         private void SudokuControl_MouseMove(object sender, MouseEventArgs e)
         {
-            PickContext context = new PickContext(ClientSize);
+            PickContext context = new PickContext(ClientSize, Cells);
             Size cs = context.CellSize;
             int x = e.X / cs.Width;
             int y = e.Y / cs.Height;

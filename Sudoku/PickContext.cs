@@ -11,13 +11,14 @@ namespace Sudoku
         public readonly int scw, sch, ox, oy;
         public readonly Size FullSize;
 
-        public PickContext(Size size)
+        public PickContext(Size size, int cells)
         {
+            int sz = cells * 3;
             FullSize = size;
-            scw = size.Width / 27;
-            sch = size.Height / 27;
-            ox = (size.Width - scw * 27) / 2;
-            oy = (size.Height - sch * 27) / 2;
+            scw = size.Width / sz;
+            sch = size.Height / sz;
+            ox = (size.Width - scw * sz) / 2;
+            oy = (size.Height - sch * sz) / 2;
         }
 
         public Size SubcellSize { get { return new Size(scw, sch); } }
