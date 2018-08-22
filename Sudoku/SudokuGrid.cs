@@ -41,6 +41,8 @@ namespace Sudoku
             public int cellA, cellB;
             public char start;
 
+            public static GridOptions Instance { get { return SudokuForm.Instance.Grid.gridOptions; } }
+
             public int Cells { get { return cellA * cellB; } }
 
             public bool FromChar(char c, out int i)

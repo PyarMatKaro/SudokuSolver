@@ -29,7 +29,7 @@ namespace Sudoku
         {
             ca = new SudokuRequirement[nc];
             for (int i = 0; i < ca.Length; ++i)
-                ca[i] = new SudokuRequirement() { grid = grid };
+                ca[i] = new SudokuRequirement();
         }
 
         protected void CreateOptionals(SudokuGrid grid, int nc)

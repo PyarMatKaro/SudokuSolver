@@ -16,8 +16,13 @@ namespace Sudoku
         //int defCellA = 3;
         //int defCellB = 3;
 
+        public static SudokuForm Instance;
+
         public SudokuForm()
         {
+            System.Diagnostics.Debug.Assert(Instance == null);
+            Instance = this;
+
             InitializeComponent();
             CreateChildMenus();
             LoadOptions();
@@ -25,6 +30,9 @@ namespace Sudoku
 
         public SudokuForm(SudokuGrid grid)
         {
+            System.Diagnostics.Debug.Assert(Instance == null);
+            Instance = this;
+
             InitializeComponent();
             sudokuControl.Grid = grid;
             CreateChildMenus();

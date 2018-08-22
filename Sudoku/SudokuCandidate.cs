@@ -41,7 +41,7 @@ namespace Sudoku
 
         public override string ToString()
         {
-            return "fill " + (1 + x) + "," + (1 + y) + " with " + (1 + n);
+            return "fill " + (1 + x) + "," + (1 + y) + " with " + Sudoku.SudokuGrid.GridOptions.Instance.ToChar(n);
         }
 
         public override void PaintForeground(HintPainter hp, Hint.Kind v)

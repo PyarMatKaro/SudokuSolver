@@ -11,7 +11,6 @@ namespace Sudoku
     {
         public Houses house;
         public int i0, i1;
-        public SudokuGrid grid;
 
         public SudokuRequirement()
         {
@@ -39,6 +38,7 @@ namespace Sudoku
 
         public override string RequirementString()
         {
+            Sudoku.SudokuGrid.GridOptions grid = Sudoku.SudokuGrid.GridOptions.Instance;
             if (house == Houses.Cell)
                 return "fill cell at " + (1 + i0) + "," + (1 + i1);
             if (house == Houses.Column)
