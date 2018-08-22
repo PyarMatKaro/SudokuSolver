@@ -11,6 +11,7 @@ namespace Sudoku
     {
         public Houses house;
         public int i0, i1;
+        public SudokuGrid grid;
 
         public SudokuRequirement()
         {
@@ -45,13 +46,13 @@ namespace Sudoku
             if (house == Houses.Row)
                 return "place " + (1 + i1) + " in row " + (1 + i0);
             if (house == Houses.Box)
-                return "place " + (1 + i1) + " in box " + (char)('a' + i0);
+                return "place " + grid.ToChar(i1) + " in box " + (char)('a' + i0);
             if (house == Houses.MajorDiagonal)
-                return "place " + (1 + i0) + " in major diagonal";
+                return "place " + grid.ToChar(i0) + " in major diagonal";
             if (house == Houses.MinorDiagonal)
-                return "place " + (1 + i0) + " in minor diagonal";
+                return "place " + grid.ToChar(i0) + " in minor diagonal";
             if(house == Houses.Cage)
-                return "place " + (i1 + 1) + " in cage " + (i0 + 1);
+                return "place " + grid.ToChar(i1) + " in cage " + (i0 + 1);
             return "?";
         }
 

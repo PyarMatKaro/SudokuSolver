@@ -25,11 +25,11 @@ namespace Sudoku
                         TrySelectCandidate(GetCandidate(x, y, grid.ValueAt(x, y)));
         }
 
-        protected void CreateRequirements(int nc)
+        protected void CreateRequirements(SudokuGrid grid, int nc)
         {
             ca = new SudokuRequirement[nc];
             for (int i = 0; i < ca.Length; ++i)
-                ca[i] = new SudokuRequirement();
+                ca[i] = new SudokuRequirement() { grid = grid };
         }
 
         protected void CreateOptionals(SudokuGrid grid, int nc)
@@ -117,7 +117,7 @@ namespace Sudoku
             if (grid.MinorDiagonal)
                 ++diags;
             int d = grid.MajorDiagonal ? 1 : 0; // Where minor diagonal is found
-            CreateRequirements(Cells * Cells * 4 + diags * Cells);
+            CreateRequirements(grid, Cells * Cells * 4 + diags * Cells);
             CreateOptionals(grid, num_cages);
             Houses[] houses = new Houses[]{
                 Houses.Cell,
