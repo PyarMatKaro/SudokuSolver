@@ -171,14 +171,19 @@ namespace Sudoku
             Grid.SolveLogically();
         }
 
-        private void proofToolStripMenuItem_Click(object sender, EventArgs e)
+        private void logicalProofToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.SolveProof();
+            Grid.SolveProof(true);
         }
 
         private void solveWithBacktrackingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Grid.SolveBacktracking();
+        }
+
+        private void backtrackingProofToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Grid.SolveProof(false);
         }
 
         private void solutionAsTextToolStripMenuItem_Click(object sender, EventArgs e)

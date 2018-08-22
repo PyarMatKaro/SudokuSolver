@@ -604,13 +604,21 @@ namespace Sudoku
             ShowSolveResult(SolveResult.TooDifficult);
         }
 
-        public void SolveProof()
+        public void SolveProof(bool logical)
         {
             var old = solver.log;
             using (MemoryStream ms = new MemoryStream())
             {
                 solver.log = new StreamWriter(ms);
-                SolveResult solns = solver.DoBacktrackingSolve(this);
+                SolveResult solns;
+                if (logical)
+                {
+                    HintSelections hard = new HintSelections(HintSelections.Level.Diabolical);
+                    solns = solver.DoLogicalSolve(this, hard);
+                }
+                else
+                    solns = solver.DoBacktrackingSolve(this);
+                solver.log.Flush();
                 ms.Position = 0;
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(DescribeSolveResult(solns));

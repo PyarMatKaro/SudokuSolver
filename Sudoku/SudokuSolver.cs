@@ -49,6 +49,10 @@ namespace Sudoku
                 Hint hint = SingleHint(hs);
                 if (hint == null)
                     return SolveResult.TooDifficult;
+
+                if (log != null)
+                    log.WriteLine(hint.ToString());
+                
                 SolveResult result = hint.Apply(grid);
                 if(result != SolveResult.Ongoing)
                     return result;
