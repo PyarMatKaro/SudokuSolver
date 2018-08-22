@@ -46,7 +46,9 @@ namespace Sudoku
             public bool FromChar(char c, out int i)
             {
                 i = -1;
-                if (c != '.' && c >= start && c < start + Cells)
+                if (c == '.')
+                    return true;
+                if (c >= start && c < start + Cells)
                     i = c - start;
                 else
                     return false;
@@ -904,11 +906,11 @@ namespace Sudoku
                     if (options.FromChar(c, out v))
                         s += c;
                 }
-                if (s.Length == Cells)
+                if (s.Length == options.Cells)
                     l.Add(s);
             }
             a = l.ToArray();
-            if (a.Length != Cells)
+            if (a.Length != options.Cells)
                 return false;
             ClearGrid(options);
             for (int y = 0; y < Cells; ++y)
