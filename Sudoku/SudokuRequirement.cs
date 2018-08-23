@@ -42,16 +42,16 @@ namespace Sudoku
             if (house == Houses.Cell)
                 return "fill cell at " + (1 + i0) + "," + (1 + i1);
             if (house == Houses.Column)
-                return "place " + (1 + i1) + " in column " + (1 + i0);
+                return "place " + grid.ToChar(i1) + " in column " + (1 + i0);
             if (house == Houses.Row)
-                return "place " + (1 + i1) + " in row " + (1 + i0);
+                return "place " + grid.ToChar(i1) + " in row " + (1 + i0);
             if (house == Houses.Box)
                 return "place " + grid.ToChar(i1) + " in box " + (char)('a' + i0);
             if (house == Houses.MajorDiagonal)
                 return "place " + grid.ToChar(i0) + " in major diagonal";
             if (house == Houses.MinorDiagonal)
                 return "place " + grid.ToChar(i0) + " in minor diagonal";
-            if(house == Houses.Cage)
+            if (house == Houses.Cage)
                 return "place " + grid.ToChar(i1) + " in cage " + (i0 + 1);
             return "?";
         }
