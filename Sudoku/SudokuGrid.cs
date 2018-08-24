@@ -72,7 +72,7 @@ namespace Sudoku
                 DefaultBoxes();
             }
 
-            GridOptions DefaultBoxes()
+            public GridOptions DefaultBoxes()
             {
                 boxes = new int[Cells, Cells];
                 for (int x = 0; x < Cells; ++x)
@@ -101,6 +101,21 @@ namespace Sudoku
                         lines.Add("DIAGONAL \\");
                 else if (minorDiagonal)
                     lines.Add("DIAGONAL /");
+            }
+
+            public bool CheckSizeLine(string check)
+            {
+                string[] os = check.Split(',');
+                if (os.Length >= 2)
+                {
+                    cellA = int.Parse(os[0]);
+                    cellB = int.Parse(os[1]);
+                    if (os.Length >= 3 && os[2].Length == 1)
+                        start = os[2][0];
+                    return true;
+                }
+
+                return false;
             }
 
             public bool CheckDiagonalsLine(string check)
@@ -835,40 +850,36 @@ namespace Sudoku
             }
         }
 
-        public void SetGridStrings(string[] a)
+        public bool SetGridStrings(string[] a)
         {
             if (SetGridStrings9x9Killer(a))
-                return;
-            cageInfo = null;
+                return true;
             if (SetGridStrings9x9Jigsaw(a))
-                return;
+                return true;
             if (SetGridStrings81Jigsaw(a))
-                return;
+                return true;
             if (SetGridStrings9x9(a))
-                return;
-            SetGridStrings81(a);
+                return true;
+            return SetGridStrings81(a);
         }
 
         void CheckHeader(string[] a, out int i, out GridOptions options)
         {
-            int cellA = 3, cellB = 3;
-            char start = '1';
+            options = new SudokuGrid.GridOptions(3, 3, '1');
             i = 0;
-            if (a.Length > 0)
+            while(i < a.Length)
             {
-                string[] os = a[i].Split(',');
-                if (os.Length >= 2)
+                string line = a[i].ToUpperInvariant();
+                if (options.CheckDiagonalsLine(line))
+                    i++;
+                else if (options.CheckSizeLine(line))
+                    i++;
+                else
                 {
-                    cellA = int.Parse(os[0]);
-                    cellB = int.Parse(os[1]);
-                    ++i;
-                    if (os.Length >= 3 && os[2].Length == 1)
-                        start = os[2][0];
+                    options.DefaultBoxes();
+                    return;
                 }
             }
-            options = new GridOptions(cellA, cellB, start);
-            if (options.CheckDiagonalsLine(a[i].ToUpperInvariant()))
-                i++;
         }
 
         public bool SetGridStrings81(string[] a)
@@ -944,6 +955,7 @@ namespace Sudoku
             int i0;
             CheckHeader(a0, out i0, out options);
             options.isKiller = true;
+            int cells = options.Cells;
             List<string> l = new List<string>();
             List<string> aLine = new List<string>();
             List<string> aSum = new List<string>();
@@ -951,29 +963,27 @@ namespace Sudoku
             {
                 string[] a = a0[i].Split(' ');
                 foreach (string s in a)
-                    if (s.Length == Cells)
-                        aLine.Add(s);
-                    else if (s.Length > 2 && s[1] == '=')
+                    if (s.Length > 2 && s[1] == '=')
                         aSum.Add(s);
+                    else if (s.Length == cells)
+                        aLine.Add(s);
                     else if (s.Length > 0)
                         return false;
             }
-            if (aLine.Count != Cells)
+            if (aLine.Count != options.Cells)
                 return false;
-            ClearGrid(options);
-            cageInfo = new CageInfo(Cells);
+            CageInfo cageInfo = new CageInfo(cells);
             Dictionary<char, int> names = new Dictionary<char, int>();
             Dictionary<int, int> totals = new Dictionary<int, int>();
             int num_cages = 0;
-            for (int y = 0; y < Cells; ++y)
+            for (int y = 0; y < cells; ++y)
             {
                 string s = aLine[y];
-                for (int x = 0; x < Cells; ++x)
+                for (int x = 0; x < cells; ++x)
                 {
                     int this_cage;
                     char c = s[x];
-                    int v;
-                    if (options.FromChar(c, out v) && v != -1)
+                    if (c >= '1' && c <= '0' + cells)
                     {
                         this_cage = num_cages++;
                         totals[this_cage] = c - '0';
@@ -983,8 +993,6 @@ namespace Sudoku
                         if (!names.TryGetValue(c, out this_cage))
                             names[c] = this_cage = num_cages++;
                     }
-                    values[x, y] = -1;
-                    flags[x, y] = CellFlags.Free;
                     cageInfo.cages[x, y] = this_cage;
                 }
             }
@@ -1005,31 +1013,18 @@ namespace Sudoku
                 return false;
             cageInfo.totals = new int[num_cages];
             int grand = 0;
-            for (int j = 0; j < NumCages; ++j)
+            for (int j = 0; j < num_cages; ++j)
             {
                 cageInfo.totals[j] = totals[j];
                 grand += cageInfo.totals[j];
             }
-            if (grand != Cells * Cells * 5)
+            if (grand * 2 != cells * cells * (cells + 1))
                 return false;
 
+            ClearGrid(options);
+            this.cageInfo = cageInfo;
             ColourSolver cs = new ColourSolver();
             gridOptions.colours = cs.Solve(this, cageInfo.cages, NumCages);
-
-            cageInfo.Reset();
-            /*
-            for (int y = 0; y < Cells; ++y)
-                for (int x = 0; x < Cells; ++x)
-                {
-                    int cage = cageInfo.cages[x, y];
-                    if (cageInfo.sizes[cage] == 1)
-                    {
-                        values[x, y] = cageInfo.totals[cage] - 1;
-                        flags[x, y] = CellFlags.Fixed;
-                    }
-                }
-             */
-
             ResetSolver();
             return true;
         }

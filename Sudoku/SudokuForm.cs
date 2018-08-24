@@ -264,14 +264,19 @@ namespace Sudoku
                     while (!sr.EndOfStream)
                         lines.Add(sr.ReadLine());
                     sr.Close();
-                    Grid.SetGridStrings(lines.ToArray());
-
-                    Grid.PlayMode = SudokuGrid.PlayModes.Play;
-                    UpdateMode();
+                    if (Grid.SetGridStrings(lines.ToArray()))
+                    {
+                        Grid.PlayMode = SudokuGrid.PlayModes.Play;
+                        UpdateMode();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Grid not loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.ToString());
+                    MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
