@@ -52,7 +52,7 @@ namespace Sudoku
 
                 if (log != null)
                 {
-                    if (!(hint is ForcedMoveHint))
+                    if (hint.IsComplex)
                     {
                         int sc = tsc;
                         var action = hint.Illustration;

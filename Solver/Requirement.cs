@@ -63,22 +63,22 @@ namespace Solver
 
         public abstract string RequirementString();
 
-        public string RequirementString(int s)
+        public string RequirementString(bool statement, int s)
         {
             string ret;
             if (s == 0)
-                ret = "no way to ";
+                ret = (statement ? "there is " : "") + "no way to ";
             else if (s == 1)
-                ret = "only one way to ";
+                ret = (statement ? "there is " : "") + "only one way to ";
             else
-                ret = s + " ways to ";
+                ret = (statement ? "there are " : "") + s + " ways to ";
 
             return ret + RequirementString();
         }
 
         public override string ToString()
         {
-            return RequirementString(s);
+            return RequirementString(true, s);
         }
 
         public Candidate[] UnselectedCandidates

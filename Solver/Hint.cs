@@ -19,6 +19,8 @@ namespace Solver
         public abstract override string ToString();
         public abstract Actions Recommendation { get; }
         public abstract Actions Illustration { get; }
+        public abstract bool IsComplex { get; }
+
         public SolveResult Apply(Problem grid)
         {
             switch (Recommendation)
@@ -61,9 +63,10 @@ namespace Solver
 
         public override string ToString()
         {
-            return "No solution, since " + c.RequirementString(0);
+            return "There is no solution, since " + c.RequirementString(true, 0);
         }
 
+        public override bool IsComplex { get { return false; } }
         public override Actions Recommendation { get { return Actions.Impossible; } }
         public override Actions Illustration { get { return Actions.Select; } }
 
@@ -94,9 +97,10 @@ namespace Solver
 
         public override string ToString()
         {
-            return "Must " + Candidate + ", since " + c.RequirementString(1);
+            return "We must " + Candidate + ", since " + c.RequirementString(true, 1);
         }
 
+        public override bool IsComplex { get { return false; } }
         public override Actions Recommendation { get { return Actions.Select; } }
         public override Actions Illustration { get { return Actions.Discard; } }
         
@@ -130,10 +134,11 @@ namespace Solver
 
         public override string ToString()
         {
-            return "Cannot " + Candidate + ", since this " +
-                (eventual ? "eventually " : "") + "leads to " + c.RequirementString(0);
+            return "We cannot " + Candidate + ", since this " +
+                (eventual ? "eventually " : "") + "leads to " + c.RequirementString(false, 0);
         }
 
+        public override bool IsComplex { get { return eventual; } }
         public override Actions Recommendation { get { return Actions.Discard; } }
         public override Actions Illustration { get { return Actions.Select; } }
         
@@ -155,12 +160,13 @@ namespace Solver
             this.c = c;
         }
 
+        public override bool IsComplex { get { return true; } }
         public override Requirement Requirement { get { return c; } }
         public override Candidate Candidate { get { return r; } }
 
         public override string ToString()
         {
-            return "Must " + Candidate + ", discarding eventually leads to " + c.RequirementString(0);
+            return "We must " + Candidate + ", not doing so eventually leads to " + c.RequirementString(false, 0);
         }
 
         public override Actions Recommendation { get { return Actions.Select; } }
@@ -186,7 +192,7 @@ namespace Solver
 
         public override string ToString()
         {
-            return "Should " + Candidate + ", assuming there is a single solution";
+            return "We should " + Candidate + ", assuming there is a single solution";
         }
 
         public override void PaintForeground(HintPainter context)
@@ -194,6 +200,7 @@ namespace Solver
             Candidate.PaintForeground(context, Hint.Kind.AmongMust);
         }
 
+        public override bool IsComplex { get { return true; } }
         public override Actions Recommendation { get { return Actions.Select; } }
         public override Actions Illustration { get { return Actions.Select; } }
         
