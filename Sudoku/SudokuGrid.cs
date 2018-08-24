@@ -48,7 +48,7 @@ namespace Sudoku
             public bool FromChar(char c, out int i)
             {
                 i = -1;
-                if (c == '.')
+                if (c == '.' || c == '0')
                     return true;
                 if (c >= start && c < start + Cells)
                     i = c - start;

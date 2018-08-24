@@ -51,8 +51,47 @@ namespace Sudoku
                     return SolveResult.TooDifficult;
 
                 if (log != null)
+                {
+                    if (!(hint is ForcedMoveHint))
+                    {
+                        int sc = tsc;
+                        var action = hint.Illustration;
+                        if (action == Hint.Actions.Discard)
+                        {
+                            log.WriteLine("Suppose we do not " + hint.Candidate);
+                            DiscardCandidate(hint.Candidate);
+                        }
+                        if (action == Hint.Actions.Select)
+                        {
+                            log.WriteLine("Suppose we " + hint.Candidate);
+                            SelectCandidate(hint.Candidate);
+                        }
+
+                        int solns = 0;
+                        while (true)
+                        {
+                            if (Solved)
+                                break;
+                            Requirement r = EasiestRequirement;
+                            solns = r.s;
+                            if (solns == 0)
+                                log.WriteLine(" " + r); // No way to...
+                            if (solns != 1)
+                                break;
+                            Candidate c = r.UnselectedCandidates[0];
+                            log.WriteLine(" then we must " + c);
+                            SelectCandidate(c);
+                        }
+
+                        while (tsc > sc)
+                            UnselectCandidate();
+                        if (action == Hint.Actions.Discard)
+                            UndiscardCandidate(hint.Candidate);
+                    }
+
                     log.WriteLine(hint.ToString());
-                
+                }
+
                 SolveResult result = hint.Apply(grid);
                 if(result != SolveResult.Ongoing)
                     return result;

@@ -15,8 +15,31 @@ namespace Solver
             AmongMust // another candidate must be selected for the requirement
         };
 
+        public enum Actions { Discard, Select, Impossible, Solved };
         public abstract override string ToString();
-        public abstract SolveResult Apply(Problem grid);
+        public abstract Actions Recommendation { get; }
+        public abstract Actions Illustration { get; }
+        public SolveResult Apply(Problem grid)
+        {
+            switch (Recommendation)
+            {
+                case Actions.Discard:
+                    // DiscardableHint
+                    grid.DiscardCandidate(Candidate);
+                    break;
+                case Actions.Select:
+                    // ForcedMoveHint SelectableHint
+                    grid.SelectCandidate(Candidate);
+                    break;
+                case Actions.Impossible:
+                    // ImpossibleHint
+                    return SolveResult.NoSolutions;
+                case Actions.Solved:
+                    break;
+            }
+
+            return SolveResult.Ongoing;
+        }
 
         public virtual void PaintBackground(HintPainter context) { }
         public virtual void PaintForeground(HintPainter context) { }
@@ -41,10 +64,8 @@ namespace Solver
             return "No solution, since " + c.RequirementString(0);
         }
 
-        public override SolveResult Apply(Problem grid)
-        {
-            return SolveResult.NoSolutions;
-        }
+        public override Actions Recommendation { get { return Actions.Impossible; } }
+        public override Actions Illustration { get { return Actions.Select; } }
 
         public override void PaintBackground(HintPainter context)
         {
@@ -76,12 +97,9 @@ namespace Solver
             return "Must " + Candidate + ", since " + c.RequirementString(1);
         }
 
-        public override SolveResult Apply(Problem grid)
-        {
-            grid.SelectCandidate(Candidate);
-            return SolveResult.Ongoing;
-        }
-
+        public override Actions Recommendation { get { return Actions.Select; } }
+        public override Actions Illustration { get { return Actions.Discard; } }
+        
         public override void PaintBackground(HintPainter context)
         {
             Requirement.PaintBackground(context, Hint.Kind.AmongMust);
@@ -116,12 +134,9 @@ namespace Solver
                 (eventual ? "eventually " : "") + "leads to " + c.RequirementString(0);
         }
 
-        public override SolveResult Apply(Problem grid)
-        {
-            grid.DiscardCandidate(Candidate);
-            return SolveResult.Ongoing;
-        }
-
+        public override Actions Recommendation { get { return Actions.Discard; } }
+        public override Actions Illustration { get { return Actions.Select; } }
+        
         public override void PaintForeground(HintPainter context)
         {
             Candidate.PaintForeground(context, 0);
@@ -148,12 +163,9 @@ namespace Solver
             return "Must " + Candidate + ", discarding eventually leads to " + c.RequirementString(0);
         }
 
-        public override SolveResult Apply(Problem grid)
-        {
-            grid.SelectCandidate(Candidate);
-            return SolveResult.Ongoing;
-        }
-
+        public override Actions Recommendation { get { return Actions.Select; } }
+        public override Actions Illustration { get { return Actions.Discard; } }
+        
         public override void PaintForeground(HintPainter context)
         {
             Candidate.PaintForeground(context, Hint.Kind.AmongMust);
@@ -182,11 +194,8 @@ namespace Solver
             Candidate.PaintForeground(context, Hint.Kind.AmongMust);
         }
 
-        public override SolveResult Apply(Problem grid)
-        {
-            grid.SelectCandidate(r);
-            return SolveResult.Ongoing;
-        }
-
+        public override Actions Recommendation { get { return Actions.Select; } }
+        public override Actions Illustration { get { return Actions.Select; } }
+        
     }
 }
