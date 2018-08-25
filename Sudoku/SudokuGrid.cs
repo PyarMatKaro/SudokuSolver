@@ -649,6 +649,7 @@ namespace Sudoku
                 form.btnCancel.Visible = false;
                 form.tbText.ReadOnly = true;
                 form.tbText.Text = sb.ToString();
+                Updated();
                 form.ShowDialog();
             }
 

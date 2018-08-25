@@ -61,12 +61,13 @@ namespace Sudoku
             Close();
         }
 
+        PuzzleTextForm puzzleForm = new PuzzleTextForm();
+
         private void textToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TextForm tf = new TextForm();
-            tf.tbText.Lines = Grid.GridStrings();
-            if (tf.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                Grid.SetGridStrings(tf.tbText.Lines);
+            puzzleForm.Form = this;
+            puzzleForm.tbText.Lines = Grid.GridStrings();
+            puzzleForm.Show();
         }
 
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -106,7 +107,7 @@ namespace Sudoku
             Utils.Utils.WriteObject("HintOptions.xml", Grid.HintOptions);
         }
 
-        void UpdateMode()
+        public void UpdateMode()
         {
             editBoxToolStripMenuItem.Checked = Grid.PlayMode == SudokuGrid.PlayModes.EditBox;
             editBoxToolStripMenuItem.Enabled = Grid.IsJigsaw;
