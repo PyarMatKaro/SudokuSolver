@@ -638,11 +638,11 @@ namespace Sudoku
                 solver.log.Flush();
                 ms.Position = 0;
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine(DescribeSolveResult(solns));
                 string line;
                 using (StreamReader sr = new StreamReader(ms))
                     while ((line = sr.ReadLine()) != null)
                         sb.AppendLine(line);
+                sb.AppendLine(DescribeSolveResult(solns));
                 solver.log = old;
 
                 TextForm form = new TextForm();
