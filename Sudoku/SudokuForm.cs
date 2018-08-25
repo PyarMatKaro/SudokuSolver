@@ -118,65 +118,7 @@ namespace Sudoku
             pencilToolStripMenuItem.Checked = Grid.PlayMode == SudokuGrid.PlayModes.Pencil;
             Grid.Updated();
         }
-
-        SudokuGrid.GridOptions CreateOptions()
-        {
-            return new SudokuGrid.GridOptions(Grid.CellA, Grid.CellB, Grid.Start);
-        }
-
-        SudokuGrid.GridOptions CreateOptions(int a, int b, char start)
-        {
-            return new SudokuGrid.GridOptions(a, b, start);
-        }
-
-        private void newGrid(int a, int b, char start)
-        {
-            var options = CreateOptions(a, b, start);
-            Grid.ClearGrid(options);
-            Grid.ResetSolver();
-        }
-
-        private void newGridMenuItem_4x4_Click(object sender, EventArgs e)
-        {
-            newGrid(2, 2, '1');
-        }
-
-        private void newGridMenuItem_6x6_Click(object sender, EventArgs e)
-        {
-            newGrid(3, 2, '1');
-        }
-
-        private void newGridMenuItem_8x8_Click(object sender, EventArgs e)
-        {
-            newGrid(4, 2, '1');
-        }
-
-        private void newGridMenuItem_9x9_Click(object sender, EventArgs e)
-        {
-            newGrid(3, 3, '1');
-        }
-
-        private void newGridMenuItem_16x16_Click(object sender, EventArgs e)
-        {
-            newGrid(4, 4, 'A');
-        }
-
-        private void new1DiagonalGridToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var options = CreateOptions();
-            options.majorDiagonal = true;
-            Grid.ClearGrid(options);
-            Grid.Setup();
-        }
-
-        private void new2DiagonalsGridToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var options = CreateOptions();
-            options.majorDiagonal = options.minorDiagonal = true;
-            Grid.ClearGrid(options);
-            Grid.Setup();
-        }
-
+        
         private void solveLogicallyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Grid.SolveLogically();
@@ -328,29 +270,27 @@ namespace Sudoku
         {
             ClientSize = new Size(386, 440); // Make border visible
         }
-
-        private void newKillerGridToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var options = CreateOptions();
-            options.isKiller = true;
-            Grid.ClearGrid(options);
-            Grid.Setup();
-        }
-
-        private void newJigsawGridToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var options = CreateOptions();
-            options.isJigsaw = true;
-            Grid.ClearGrid(options);
-            Grid.Setup();
-            UpdateMode();
-        }
-
+        
         private void editBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Grid.PlayMode = SudokuGrid.PlayModes.EditBox;
             UpdateMode();
         }
 
+        private void newGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GridForm gf = new GridForm();
+            gf.InitControls(this, Grid.gridOptions);
+            gf.ShowDialog();
+        }
+
+        public void CreateGrid(SudokuGrid.GridOptions options)
+        {
+            Grid.ClearGrid(options);
+            if (options.isKiller)
+                Grid.SetDefaultKiller();
+            Grid.Setup();
+            UpdateMode();
+        }
     }
 }

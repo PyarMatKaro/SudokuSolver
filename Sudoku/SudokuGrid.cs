@@ -27,7 +27,7 @@ namespace Sudoku
 
         List<UpdateListener> listeners = new List<UpdateListener>();
         int[,] values;
-        GridOptions gridOptions;
+        public GridOptions gridOptions;
         SudokuSolver solver;
         HintOptions hintOptions = new HintOptions();
         Hint[] paintedHints = new Hint[0];
@@ -242,26 +242,8 @@ namespace Sudoku
             solver = new SudokuSolver(this);
         }
 
-        public bool IsKiller
-        {
-            get
-            {
-                return cageInfo != null;
-            }
-        }
-
-        public bool IsJigsaw
-        {
-            get
-            {
-                return gridOptions.isJigsaw;
-                //for (int x = 0; x < Cells; ++x)
-                //    for (int y = 0; y < Cells; ++y)
-                //        if (boxes[x, y] != DefaultBoxAt(x, y))
-                //            return true;
-                //return false;
-            }
-        }
+        public bool IsKiller { get { return gridOptions.isKiller; } }
+        public bool IsJigsaw { get { return gridOptions.isJigsaw; } }
 
         public void AddListener(UpdateListener listener)
         {
@@ -334,8 +316,8 @@ namespace Sudoku
             if (IsKiller)
             {
                 Point?[] cage_indicators = new Point?[NumCages];
-                for (int y = 8; y >= 0; --y)
-                    for (int x = 8; x >= 0; --x)
+                for (int y = Cells - 1; y >= 0; --y)
+                    for (int x = Cells - 1; x >= 0; --x)
                         if (flags[x, y] == CellFlags.Free)
                             cage_indicators[cageInfo.cages[x, y]] = new Point(x, y);
 
@@ -1011,6 +993,29 @@ namespace Sudoku
             this.cageInfo = cageInfo;
             Setup();
             return true;
+        }
+
+        public void SetDefaultKiller()
+        {
+            int cells = Cells;
+            CageInfo cageInfo = new CageInfo(cells);
+            int numCages = 0;
+            int[] totals = new int[cells * cells];
+            for (int i0 = 0; i0 < CellA; ++i0)
+                for (int i1 = 0; i1 < CellB; ++i1)
+                    for (int i2 = 0; i2 < CellA; ++i2)
+                        for (int i3 = 0; i3 < CellB; ++i3)
+                        {
+                            int n = (i0 * CellB + i1 + i2 + i3 * CellA) % cells;
+                            int x = i0 * CellB + i1;
+                            int y = i2 * CellB + i3;
+
+                            int this_cage = numCages++;
+                            totals[this_cage] = 1 + n;
+                            cageInfo.cages[x, y] = this_cage;
+                        }
+            cageInfo.totals = totals;
+            this.cageInfo = cageInfo;
         }
 
         public bool SetGridStrings9x9Jigsaw(string[] a)
