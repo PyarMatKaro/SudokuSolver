@@ -1029,16 +1029,17 @@ namespace Sudoku
             GridOptions options;
             int i;
             CheckHeader(a, out i, out options);
+            int cells = options.Cells;
             List<string> l = new List<string>();
             options.isJigsaw = true;
-            options.boxes = new int[Cells, Cells];
+            options.boxes = new int[cells, cells];
             for (int y = i; y < a.Length; ++y)
             {
                 string s = "";
                 for (int x = 0; x < a[y].Length - 1; ++x)
                 {
                     char b = a[y][x];
-                    if (b >= 'a' && b < 'a' + Cells)
+                    if (b >= 'a' && b < 'a' + cells)
                     {
                         ++x;
                         char c = a[y][x];
@@ -1052,15 +1053,15 @@ namespace Sudoku
                         }
                     }
                 }
-                if (s.Length == 18)
+                if (s.Length == 2 * cells)
                     l.Add(s);
             }
             a = l.ToArray();
-            if (a.Length != Cells)
+            if (a.Length != cells)
                 return false;
             ClearGrid(options);
-            for (int y = 0; y < Cells; ++y)
-                for (int x = 0; x < Cells; ++x)
+            for (int y = 0; y < cells; ++y)
+                for (int x = 0; x < cells; ++x)
                 {
                     char b = a[y][x * 2];
                     char c = a[y][x * 2 + 1];
@@ -1080,7 +1081,7 @@ namespace Sudoku
                 }
 
             ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, gridOptions.boxes, Cells);
+            gridOptions.colours = cs.Solve(this, gridOptions.boxes, cells);
             ResetSolver();
             return true;
         }
