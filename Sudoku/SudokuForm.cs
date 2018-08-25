@@ -18,8 +18,8 @@ namespace Sudoku
 
         public static SudokuForm Instance;
 
-        PuzzleTextForm puzzleForm = new PuzzleTextForm();
-        internal TextForm proofForm = new TextForm();
+        PuzzleTextForm puzzleForm = new PuzzleTextForm() { Text = "Puzzle" };
+        internal TextForm proofForm = new TextForm() { Text = "Proof" };
 
         public SudokuForm()
         {
@@ -69,6 +69,7 @@ namespace Sudoku
             puzzleForm.Form = this;
             puzzleForm.tbText.Lines = Grid.GridStrings();
             puzzleForm.Show();
+            puzzleForm.BringToFront();
         }
 
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -189,6 +190,7 @@ namespace Sudoku
             proofForm.tbText.Text = proof;
             Grid.Updated();
             proofForm.Show();
+            proofForm.BringToFront();
         }
 
         private void logicalProofToolStripMenuItem_Click(object sender, EventArgs e)
