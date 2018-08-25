@@ -184,7 +184,7 @@ namespace Sudoku
 
         void SolveProof(bool logical)
         {
-            string proof = Grid.SolveProof(true);
+            string proof = Grid.SolveProof(logical);
             proofForm.btnCancel.Visible = false;
             proofForm.tbText.ReadOnly = true;
             proofForm.tbText.Text = proof;
