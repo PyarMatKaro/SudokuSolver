@@ -18,6 +18,9 @@ namespace Sudoku
 
         public static SudokuForm Instance;
 
+        PuzzleTextForm puzzleForm = new PuzzleTextForm();
+        internal TextForm proofForm = new TextForm();
+
         public SudokuForm()
         {
             System.Diagnostics.Debug.Assert(Instance == null);
@@ -60,8 +63,6 @@ namespace Sudoku
         {
             Close();
         }
-
-        PuzzleTextForm puzzleForm = new PuzzleTextForm();
 
         private void textToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -180,9 +181,19 @@ namespace Sudoku
             Grid.SolveLogically();
         }
 
+        void SolveProof(bool logical)
+        {
+            string proof = Grid.SolveProof(true);
+            proofForm.btnCancel.Visible = false;
+            proofForm.tbText.ReadOnly = true;
+            proofForm.tbText.Text = proof;
+            Grid.Updated();
+            proofForm.Show();
+        }
+
         private void logicalProofToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.SolveProof(true);
+            SolveProof(true);
         }
 
         private void solveWithBacktrackingToolStripMenuItem_Click(object sender, EventArgs e)
@@ -192,7 +203,7 @@ namespace Sudoku
 
         private void backtrackingProofToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.SolveProof(false);
+            SolveProof(false);
         }
 
         private void solutionAsTextToolStripMenuItem_Click(object sender, EventArgs e)

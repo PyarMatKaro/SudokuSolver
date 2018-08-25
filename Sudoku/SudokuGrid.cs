@@ -621,7 +621,7 @@ namespace Sudoku
             ShowSolveResult(SolveResult.TooDifficult);
         }
 
-        public void SolveProof(bool logical)
+        public string SolveProof(bool logical)
         {
             var old = solver.log;
             using (MemoryStream ms = new MemoryStream())
@@ -644,13 +644,7 @@ namespace Sudoku
                         sb.AppendLine(line);
                 sb.AppendLine(DescribeSolveResult(solns));
                 solver.log = old;
-
-                TextForm form = new TextForm();
-                form.btnCancel.Visible = false;
-                form.tbText.ReadOnly = true;
-                form.tbText.Text = sb.ToString();
-                Updated();
-                form.ShowDialog();
+                return sb.ToString();
             }
 
         }
