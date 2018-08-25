@@ -79,7 +79,8 @@ namespace Sudoku
                             if (solns != 1)
                                 break;
                             Candidate c = r.UnselectedCandidates[0];
-                            log.WriteLine(" then we must " + c);
+                            //log.WriteLine(" then we must " + c);
+                            log.WriteLine(" " + r);
                             SelectCandidate(c);
                         }
 
