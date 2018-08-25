@@ -80,7 +80,7 @@ namespace Sudoku
                                 break;
                             Candidate c = r.UnselectedCandidates[0];
                             //log.WriteLine(" then we must " + c);
-                            log.WriteLine(" " + r);
+                            log.WriteLine(" then " + c + " because " + r);
                             SelectCandidate(c);
                         }
 
