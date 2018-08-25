@@ -80,16 +80,7 @@ namespace Sudoku
                         boxes[x, y] = DefaultBoxAt(x, y, cellA, cellB);
                 return this;
             }
-
-            public GridOptions DefaultColours()
-            {
-                colours = new int[Cells, Cells];
-                for (int x = 0; x < Cells; ++x)
-                    for (int y = 0; y < Cells; ++y)
-                        colours[x, y] = (x / 3 + y / 3) % 4;
-                return this;
-            }
-
+            
             public void AddHeaderLines(List<string> lines)
             {
                 if (cellA != 3 || cellB != 3 || start != '0')
@@ -899,7 +890,7 @@ namespace Sudoku
                             flags[x, y] = CellFlags.Fixed;
                         }
                     }
-                ResetSolver();
+                Setup();
                 return true;
             }
 
@@ -940,7 +931,7 @@ namespace Sudoku
                         flags[x, y] = CellFlags.Fixed;
                     }
                 }
-            ResetSolver();
+            Setup();
             return true;
         }
 
@@ -1018,9 +1009,7 @@ namespace Sudoku
 
             ClearGrid(options);
             this.cageInfo = cageInfo;
-            ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, cageInfo.cages, NumCages);
-            ResetSolver();
+            Setup();
             return true;
         }
 
@@ -1080,9 +1069,7 @@ namespace Sudoku
                     gridOptions.boxes[x, y] = b - 'a';
                 }
 
-            ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, gridOptions.boxes, cells);
-            ResetSolver();
+            Setup();
             return true;
         }
 
@@ -1123,10 +1110,27 @@ namespace Sudoku
                     gridOptions.boxes[x, y] = b - '0';
             }
 
-            ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, gridOptions.boxes, Cells);
-            ResetSolver();
+            Setup();
             return true;
+        }
+
+        public void Setup()
+        {
+            if (IsJigsaw)
+                ColourByBoxes();
+            else if (IsKiller)
+                ColourByCages();
+            ResetSolver();
+        }
+
+        void ColourByBoxes()
+        {
+            gridOptions.colours = new ColourSolver().Solve(this, gridOptions.boxes, Cells);
+        }
+
+        void ColourByCages()
+        {
+            gridOptions.colours = new ColourSolver().Solve(this, cageInfo.cages, NumCages);
         }
 
         public void ClearEntries()
@@ -1185,7 +1189,7 @@ namespace Sudoku
                     if (solver.DoLogicalSolve(this, hints) != SolveResult.SingleSolution)
                         SetCell(x, y, ans[x, y]);
                 }
-            ResetSolver();
+            Setup();
         }
 
         public IEnumerable<Tuple<int,int>> Neighbours(int x, int y)
@@ -1205,8 +1209,7 @@ namespace Sudoku
                     bs.Add(b);
             int i = bs.IndexOf(gridOptions.boxes[x, y]);
             gridOptions.boxes[x, y] = bs[i == bs.Count - 1 ? 0 : i + 1];
-            ColourSolver cs = new ColourSolver();
-            gridOptions.colours = cs.Solve(this, gridOptions.boxes, Cells);
+            ColourByBoxes();
         }
     }
 }

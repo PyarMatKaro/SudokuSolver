@@ -165,7 +165,7 @@ namespace Sudoku
             var options = CreateOptions();
             options.majorDiagonal = true;
             Grid.ClearGrid(options);
-            Grid.ResetSolver();
+            Grid.Setup();
         }
 
         private void new2DiagonalsGridToolStripMenuItem_Click(object sender, EventArgs e)
@@ -173,7 +173,7 @@ namespace Sudoku
             var options = CreateOptions();
             options.majorDiagonal = options.minorDiagonal = true;
             Grid.ClearGrid(options);
-            Grid.ResetSolver();
+            Grid.Setup();
         }
 
         private void solveLogicallyToolStripMenuItem_Click(object sender, EventArgs e)
@@ -332,15 +332,15 @@ namespace Sudoku
             var options = CreateOptions();
             options.isKiller = true;
             Grid.ClearGrid(options);
-            Grid.ResetSolver();
+            Grid.Setup();
         }
 
         private void newJigsawGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var options = CreateOptions().DefaultColours();
+            var options = CreateOptions();
             options.isJigsaw = true;
             Grid.ClearGrid(options);
-            Grid.ResetSolver();
+            Grid.Setup();
             UpdateMode();
         }
 
