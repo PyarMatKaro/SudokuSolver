@@ -15,7 +15,6 @@ namespace Sudoku
         public readonly int selx, sely;
 
         public Dictionary<Point, Dictionary<int, Hint.Kind>> pencil = new Dictionary<Point, Dictionary<int, Hint.Kind>>();
-        public int Cells { get { return grid.Cells; } }
 
         public PaintContext(Graphics graphics, Size size, SudokuGrid grid, int selx, int sely)
             : base(size, grid.CellA, grid.CellB)
@@ -159,7 +158,7 @@ namespace Sudoku
         public void DrawTotal(Brush br, int x, int y, string s)
         {
             Size csz = SubcellSize;
-            Point p = SubcellLocation(x * 3, y * 3);
+            Point p = CellLocation(x, y);
             SizeF sz = graphics.MeasureString(s, SmallFont);
             graphics.DrawString(s, SmallFont, br, p.X + (csz.Width - sz.Width) / 2, p.Y + (csz.Height - sz.Height) / 2);
         }

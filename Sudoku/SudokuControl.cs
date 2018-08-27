@@ -56,9 +56,8 @@ namespace Sudoku
         private void SudokuControl_MouseClick(object sender, MouseEventArgs e)
         {
             PickContext context = new PickContext(ClientSize, CellA, CellB);
-            Size cs = context.CellSize;
-            int x = e.X / cs.Width;
-            int y = e.Y / cs.Height;
+            int x, y;
+            context.PositionOf(e.X, e.Y, out x, out y);
             if (x < 0 || x >= Cells || y < 0 || y >= Cells)
                 return;
             if (grid.PlayMode == SudokuGrid.PlayModes.EditBox)
@@ -260,9 +259,8 @@ namespace Sudoku
         private void SudokuControl_MouseMove(object sender, MouseEventArgs e)
         {
             PickContext context = new PickContext(ClientSize, CellA, CellB);
-            Size cs = context.CellSize;
-            int x = e.X / cs.Width;
-            int y = e.Y / cs.Height;
+            int x, y;
+            context.PositionOf(e.X, e.Y, out x, out y);
             if (x < 0 || x >= Cells || y < 0 || y >= Cells)
             {
                 toolTipText = null;
