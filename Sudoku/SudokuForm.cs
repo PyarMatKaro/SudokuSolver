@@ -206,10 +206,25 @@ namespace Sudoku
             UpdateMode();
         }
 
+        string curFile;
+
+        string CurFile
+        {
+            get
+            {
+                return curFile;
+            }
+            set
+            {
+                curFile = value;
+                Text = Path.GetFileName(CurFile);
+            }
+        }
+
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog fd = new OpenFileDialog();
-            fd.DefaultExt="sud";
+            fd.DefaultExt = "sud";
             if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 try
@@ -222,6 +237,7 @@ namespace Sudoku
                     sr.Close();
                     if (Grid.SetGridStrings(lines.ToArray()))
                     {
+                        CurFile = fd.FileName;
                         Grid.PlayMode = SudokuGrid.PlayModes.Play;
                         UpdateMode();
                     }
@@ -237,20 +253,37 @@ namespace Sudoku
             }
         }
 
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Save(null);
+        }
+
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveFileDialog fd = new SaveFileDialog();
-            fd.DefaultExt = "sud";
-            if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            Save(CurFile);
+        }
+
+        void Save(string fileName)
+        {
+            if (fileName == null)
+            {
+                SaveFileDialog fd = new SaveFileDialog();
+                fd.DefaultExt = "sud";
+                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    fileName = fd.FileName;
+            }
+
+            if (fileName != null)
             {
                 try
                 {
                     string[] lines = Grid.GridStrings();
-                    FileStream fs = new FileStream(fd.FileName, FileMode.Create);
+                    FileStream fs = new FileStream(fileName, FileMode.Create);
                     StreamWriter sw = new StreamWriter(fs);
-                    foreach(string s in lines)
+                    foreach (string s in lines)
                         sw.WriteLine(s);
                     sw.Close();
+                    CurFile = fileName;
                 }
                 catch (Exception ex)
                 {
