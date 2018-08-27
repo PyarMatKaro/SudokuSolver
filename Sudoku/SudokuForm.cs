@@ -217,7 +217,7 @@ namespace Sudoku
             set
             {
                 curFile = value;
-                Text = Path.GetFileName(CurFile);
+                Text = (curFile == null) ? "New Sudoku" : Path.GetFileName(CurFile);
             }
         }
 
@@ -319,6 +319,7 @@ namespace Sudoku
 
         public void CreateGrid(SudokuGrid.GridOptions options)
         {
+            CurFile = null;
             Grid.ClearGrid(options);
             if (options.isKiller)
                 Grid.SetDefaultKiller();
