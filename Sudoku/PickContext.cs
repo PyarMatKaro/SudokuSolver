@@ -8,23 +8,25 @@ namespace Sudoku
 {
     public class PickContext
     {
-        public readonly int scw, sch, ox, oy;
+        public readonly int scw, sch, ox, oy, cellA, cellB;
         public readonly Size FullSize;
 
-        public PickContext(Size size, int cells)
+        public PickContext(Size size, int cellA, int cellB)
         {
-            int sz = cells * 3;
+            this.cellA = cellA;
+            this.cellB = cellB;
+            int cells = cellA * cellB;
             FullSize = size;
-            scw = size.Width / sz;
-            sch = size.Height / sz;
-            ox = (size.Width - scw * sz) / 2;
-            oy = (size.Height - sch * sz) / 2;
+            scw = size.Width / (cells * cellA);
+            sch = size.Height / (cells * cellB);
+            ox = (size.Width - scw * cells * cellA) / 2;
+            oy = (size.Height - sch * cells * cellB) / 2;
         }
 
         public Size SubcellSize { get { return new Size(scw, sch); } }
-        public Size CellSize { get { return new Size(scw * 3, sch * 3); } }
-        public Point CellLocation(int x, int y) { return new Point(ox+scw * 3 * x, oy+sch * 3 * y); }
-        public Point SubcellLocation(int x, int y) { return new Point(ox+scw * x, oy+sch * y); }
+        public Size CellSize { get { return new Size(scw * cellA, sch * cellB); } }
+        public Point CellLocation(int x, int y) { return new Point(ox + scw * cellA * x, oy + sch * cellB * y); }
+        public Point SubcellLocation(int x, int y) { return new Point(ox + scw * x, oy + sch * y); }
 
     }
 }

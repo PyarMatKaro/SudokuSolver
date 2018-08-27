@@ -18,7 +18,7 @@ namespace Sudoku
         public int Cells { get { return grid.Cells; } }
 
         public PaintContext(Graphics graphics, Size size, SudokuGrid grid, int selx, int sely)
-            : base(size, grid.Cells)
+            : base(size, grid.CellA, grid.CellB)
         {
             this.grid = grid;
             this.graphics = graphics;
@@ -114,13 +114,13 @@ namespace Sudoku
         public void FillColumn(int x, Brush back)
         {
             graphics.FillRectangle(back, new Rectangle(CellLocation(x, 0),
-                new Size(scw * 3, sch * 27)));
+                new Size(scw * cellA, sch * Cells * cellB)));
         }
 
         public void FillRow(int y, Brush back)
         {
             graphics.FillRectangle(back, new Rectangle(CellLocation(0, y),
-                new Size(scw * 27, sch * 3)));
+                new Size(scw * Cells * cellA, sch * cellB)));
         }
 
         public void FillBox(int b, Brush back)
@@ -147,10 +147,11 @@ namespace Sudoku
 
         public void DrawSubcell(Brush br, int x, int y, int n, string s)
         {
-            int x2 = n % 3;
-            int y2 = n / 3;
+            int cellA = grid.CellA, cellB = grid.CellB;
+            int x2 = n % cellA;
+            int y2 = n / cellA;
             Size csz = SubcellSize;
-            Point p = SubcellLocation(x * 3 + x2, y * 3 + y2);
+            Point p = SubcellLocation(x * cellA + x2, y * cellB + y2);
             SizeF sz = graphics.MeasureString(s, SmallFont);
             graphics.DrawString(s, SmallFont, br, p.X + (csz.Width - sz.Width) / 2, p.Y + (csz.Height - sz.Height) / 2);
         }

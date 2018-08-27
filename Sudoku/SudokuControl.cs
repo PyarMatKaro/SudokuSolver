@@ -23,6 +23,8 @@ namespace Sudoku
 
         public bool HasSelection { get { return (selx != -1 && sely != -1); } }
         public int Cells { get { return grid.Cells; } }
+        public int CellA { get { return grid.CellA; } }
+        public int CellB { get { return grid.CellB; } }
 
         public SudokuGrid Grid
         {
@@ -53,7 +55,7 @@ namespace Sudoku
 
         private void SudokuControl_MouseClick(object sender, MouseEventArgs e)
         {
-            PickContext context = new PickContext(ClientSize, Cells);
+            PickContext context = new PickContext(ClientSize, CellA, CellB);
             Size cs = context.CellSize;
             int x = e.X / cs.Width;
             int y = e.Y / cs.Height;
@@ -257,7 +259,7 @@ namespace Sudoku
 
         private void SudokuControl_MouseMove(object sender, MouseEventArgs e)
         {
-            PickContext context = new PickContext(ClientSize, Cells);
+            PickContext context = new PickContext(ClientSize, CellA, CellB);
             Size cs = context.CellSize;
             int x = e.X / cs.Width;
             int y = e.Y / cs.Height;
