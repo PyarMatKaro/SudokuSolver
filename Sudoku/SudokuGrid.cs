@@ -569,6 +569,27 @@ namespace Sudoku
             UpdatePaintedHints(false);
         }
 
+        public void RateDifficulty(out HintSelections.Level? result, out SolveResult solns)
+        {
+            HintSelections.Level[] levels = new HintSelections.Level[]{
+                HintSelections.Level.Easy,
+                HintSelections.Level.Medium,
+                HintSelections.Level.Hard,
+                HintSelections.Level.Diabolical};
+            foreach (HintSelections.Level level in levels)
+            {
+                HintSelections hs = new HintSelections(level);
+                solns = solver.DoLogicalSolve(this, hs);
+                if (solns != SolveResult.TooDifficult)
+                {
+                    result = level;
+                    return;
+                }
+            }
+            result = null;
+            solns = SolveResult.TooDifficult;
+        }
+
         public void SolveLogically()
         {
             HintSelections.Level[] levels = new HintSelections.Level[]{

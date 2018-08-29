@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="CageOptional.cs" />
     <Compile Include="ColourSolver.cs" />
+    <Compile Include="Generator.cs" />
     <Compile Include="GridForm.cs">
       <SubType>Form</SubType>
     </Compile>

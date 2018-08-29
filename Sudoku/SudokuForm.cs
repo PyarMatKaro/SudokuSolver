@@ -45,8 +45,8 @@ namespace Sudoku
 
         void CreateChildMenus()
         {
-            showToolStripMenuItem.Create(this, ()=>HintShow, true);
-            autoSolveToolStripMenuItem.Create(this, ()=>HintAutoSolve, true);
+            showToolStripMenuItem.Create(this, () => HintShow, true);
+            autoSolveToolStripMenuItem.Create(this, () => HintAutoSolve, true);
         }
 
         public SudokuGrid Grid { get { return sudokuControl.Grid; } }
@@ -56,6 +56,8 @@ namespace Sudoku
 
         private void SudokuForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (generator != null)
+                generator.Stop();
             sudokuControl.Grid = null;
         }
 
@@ -118,7 +120,7 @@ namespace Sudoku
             pencilToolStripMenuItem.Checked = Grid.PlayMode == SudokuGrid.PlayModes.Pencil;
             Grid.Updated();
         }
-        
+
         private void solveLogicallyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Grid.SolveLogically();
@@ -229,12 +231,7 @@ namespace Sudoku
             {
                 try
                 {
-                    FileStream fs = new FileStream(fd.FileName, FileMode.Open);
-                    StreamReader sr = new StreamReader(fs);
-                    List<string> lines = new List<string>();
-                    while (!sr.EndOfStream)
-                        lines.Add(sr.ReadLine());
-                    sr.Close();
+                    var lines = File.ReadAllLines(fd.FileName);
                     if (Grid.SetGridStrings(lines.ToArray()))
                     {
                         CurFile = fd.FileName;
@@ -278,11 +275,7 @@ namespace Sudoku
                 try
                 {
                     string[] lines = Grid.GridStrings();
-                    FileStream fs = new FileStream(fileName, FileMode.Create);
-                    StreamWriter sw = new StreamWriter(fs);
-                    foreach (string s in lines)
-                        sw.WriteLine(s);
-                    sw.Close();
+                    File.WriteAllLines(fileName, lines);
                     CurFile = fileName;
                 }
                 catch (Exception ex)
@@ -303,7 +296,7 @@ namespace Sudoku
         {
             ClientSize = new Size(386, 440); // Make border visible
         }
-        
+
         private void editBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Grid.PlayMode = SudokuGrid.PlayModes.EditBox;
@@ -325,6 +318,23 @@ namespace Sudoku
                 Grid.SetDefaultKiller();
             Grid.Setup();
             UpdateMode();
+        }
+
+        Generator generator;
+
+        private void autoGenerateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(generator==null)
+            {
+                autoGenerateToolStripMenuItem.Checked = true;
+                generator = new Generator(Grid.gridOptions);
+            }
+            else
+            {
+                autoGenerateToolStripMenuItem.Checked = false;
+                generator.Stop();
+                generator = null;
+            }
         }
     }
 }

@@ -42,6 +42,9 @@ namespace Sudoku
 
         public SolveResult DoLogicalSolve(SudokuGrid grid, HintSelections hs)
         {
+            if (hs == null)
+                return DoBacktrackingSolve(grid);
+
             while (true)
             {
                 if (Solved)
