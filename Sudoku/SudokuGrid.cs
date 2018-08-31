@@ -617,19 +617,18 @@ namespace Sudoku
 
         public string SolveProof(bool logical)
         {
-            var old = solver.log;
             using (MemoryStream ms = new MemoryStream())
             {
-                solver.log = new StreamWriter(ms);
+                StreamWriter log = new StreamWriter(ms);
                 SolveResult solns;
                 if (logical)
                 {
                     HintSelections hard = new HintSelections(HintSelections.Level.Diabolical);
-                    solns = solver.DoLogicalSolve(this, hard);
+                    solns = solver.DoLogicalProof(this, hard, log);
                 }
                 else
-                    solns = solver.DoBacktrackingSolve(this);
-                solver.log.Flush();
+                    solns = solver.DoBacktrackingProof(this, log);
+                log.Flush();
                 ms.Position = 0;
                 StringBuilder sb = new StringBuilder();
                 string line;
@@ -637,7 +636,6 @@ namespace Sudoku
                     while ((line = sr.ReadLine()) != null)
                         sb.AppendLine(line);
                 sb.AppendLine(DescribeSolveResult(solns));
-                solver.log = old;
                 return sb.ToString();
             }
 
@@ -648,18 +646,7 @@ namespace Sudoku
             SolveResult solns = solver.DoBacktrackingSolve(this);
             ShowSolveResult(solns);
         }
-
-        void SolveBacktracking(string log)
-        {
-            FileStream fs = new FileStream(log, FileMode.Create);
-            StreamWriter sw = new StreamWriter(fs);
-            solver.log = sw;
-            SolveResult solns = solver.DoBacktrackingSolve(this);
-            ShowSolveResult(solns);
-            sw.Close();
-            solver.log = null;
-        }
-
+        
         public void SolveLevel(HintSelections.Level level)
         {
             Updated(); // Made some progress
