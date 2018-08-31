@@ -575,6 +575,7 @@ namespace Sudoku
                 HintSelections.Level.Easy,
                 HintSelections.Level.Medium,
                 HintSelections.Level.Hard,
+                HintSelections.Level.Extreme,
                 HintSelections.Level.Diabolical};
             foreach (HintSelections.Level level in levels)
             {
@@ -596,6 +597,7 @@ namespace Sudoku
                 HintSelections.Level.Easy,
                 HintSelections.Level.Medium,
                 HintSelections.Level.Hard,
+                HintSelections.Level.Extreme,
                 HintSelections.Level.Diabolical};
             foreach (HintSelections.Level level in levels)
             {
@@ -623,7 +625,7 @@ namespace Sudoku
                 SolveResult solns;
                 if (logical)
                 {
-                    HintSelections hard = new HintSelections(HintSelections.Level.Diabolical);
+                    HintSelections hard = new HintSelections(HintSelections.Level.Extreme);
                     solns = solver.DoLogicalProof(this, hard, log);
                 }
                 else

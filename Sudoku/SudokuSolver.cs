@@ -61,9 +61,6 @@ namespace Sudoku
 
         public SolveResult DoLogicalProof(SudokuGrid grid, HintSelections hs, TextWriter log)
         {
-            if (hs == null)
-                return DoBacktrackingSolve(grid);
-
             while (true)
             {
                 if (Solved)

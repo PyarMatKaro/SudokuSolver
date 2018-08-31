@@ -334,6 +334,7 @@ namespace Solver
 
         public Hint SingleHint(HintSelections hs)
         {
+            Hint toDiscard = null;
             Requirement c = EasiestRequirement;
             if (c != null)
             {
@@ -350,14 +351,14 @@ namespace Solver
                     int o;
                     CheckSelectCandidate(k, out c, out o);
                     if (o == 0)
-                        return new DiscardableHint(k, c, false);
+                        toDiscard = new DiscardableHint(k, c, false);
                 }
             foreach (Candidate k in uc)
             {
                 int o, steps;
                 CheckSelectCandidateFollowingSingleOptions(k, out c, out o, out steps);
                 if (hs.EventualDiscardables && o == 0)
-                    return new DiscardableHint(k, c, steps > 1);
+                    toDiscard = new DiscardableHint(k, c, steps > 1);
                 if (hs.EventualSolutions && o == 1)
                     return new EventualSolutionHint(k);
                 if (hs.Selectables)
@@ -367,7 +368,8 @@ namespace Solver
                         return new SelectableHint(k, c);
                 }
             }
-            return null;
+            // It's preferable to use a hint that selects a candidate, because this satisfies requirements and moves towards a solution
+            return toDiscard;
         }
 
         public DiscardableHint[] ImmediateDiscardableHints

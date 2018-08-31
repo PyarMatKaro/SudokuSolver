@@ -20,6 +20,7 @@ namespace Solver
         ToolStripMenuItem easyToolStripMenuItem;
         ToolStripMenuItem mediumToolStripMenuItem;
         ToolStripMenuItem hardToolStripMenuItem;
+        ToolStripMenuItem extremeToolStripMenuItem;
         ToolStripMenuItem diabolicalToolStripMenuItem;
 
         public HintSelections Hints { get { return funcHints(); } }
@@ -73,6 +74,10 @@ namespace Solver
             hardToolStripMenuItem.Text = "Hard";
             hardToolStripMenuItem.Click += hardToolStripMenuItem_Click;
 
+            extremeToolStripMenuItem = new ToolStripMenuItem();
+            extremeToolStripMenuItem.Text = "Extreme";
+            extremeToolStripMenuItem.Click += extremeToolStripMenuItem_Click;
+
             diabolicalToolStripMenuItem = new ToolStripMenuItem();
             diabolicalToolStripMenuItem.Text = "Diabolical";
             diabolicalToolStripMenuItem.Click += diabolicalToolStripMenuItem_Click;
@@ -88,6 +93,7 @@ namespace Solver
                 easyToolStripMenuItem,
                 mediumToolStripMenuItem,
                 hardToolStripMenuItem,
+                extremeToolStripMenuItem,
                 diabolicalToolStripMenuItem});
         }
 
@@ -152,6 +158,12 @@ namespace Solver
             UpdateAllHints(false);
         }
 
+        private void extremeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Hints.SetLevel(HintSelections.Level.Extreme);
+            UpdateAllHints(false);
+        }
+
         private void diabolicalToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Hints.SetLevel(HintSelections.Level.Diabolical);
@@ -169,6 +181,7 @@ namespace Solver
             easyToolStripMenuItem.Checked = Hints.IsLevel(HintSelections.Level.Easy);
             mediumToolStripMenuItem.Checked = Hints.IsLevel(HintSelections.Level.Medium);
             hardToolStripMenuItem.Checked = Hints.IsLevel(HintSelections.Level.Hard);
+            extremeToolStripMenuItem.Checked = Hints.IsLevel(HintSelections.Level.Extreme);
             diabolicalToolStripMenuItem.Checked = Hints.IsLevel(HintSelections.Level.Diabolical);
         }
     }

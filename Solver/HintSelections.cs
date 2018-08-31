@@ -8,7 +8,7 @@ namespace Solver
     [Serializable]
     public class HintSelections
     {
-        public enum Level { None = 0, Easy = 1, Medium = 2, Hard = 3, Diabolical = 4 };
+        public enum Level { None = 0, Easy = 1, Medium = 2, Hard = 3, Extreme = 4, Diabolical = 5 };
 
         public bool ForcedMoves { get; set; }
         public bool ImmediateDiscardables { get; set; }
@@ -31,7 +31,7 @@ namespace Solver
             ImmediateDiscardables = (level > Level.Easy);
             EventualDiscardables = (level > Level.Medium);
             Selectables = (level > Level.Hard);
-            EventualSolutions = false;
+            EventualSolutions = (level > Level.Extreme);
         }
 
         public override bool Equals(object obj)
