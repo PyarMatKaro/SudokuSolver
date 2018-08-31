@@ -164,7 +164,7 @@ namespace Solver
                     log.WriteLine("(loop " + (++i) + "/" + s + ")");
                 log.WriteLine(r.Candidate.ToString());
                 CoverRow(r);
-                brk = BacktrackingSearch();
+                brk = BacktrackingProof(log);
                 UncoverRow();
                 if (brk)
                     break;
