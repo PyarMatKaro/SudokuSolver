@@ -287,7 +287,8 @@ namespace Sudoku
 
         private void generateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Grid.Generate(new HintSelections(HintSelections.Level.Diabolical));
+            //Grid.Generate(new HintSelections(HintSelections.Level.Extreme));
+            Grid.Generate(null);
             Grid.PlayMode = SudokuGrid.PlayModes.Play;
             UpdateMode();
         }

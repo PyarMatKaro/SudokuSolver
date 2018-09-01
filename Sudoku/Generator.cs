@@ -35,7 +35,7 @@ namespace Sudoku
             int n = 0;
             while (!stopped)
             {
-                //g.Generate(new HintSelections(HintSelections.Level.Diabolical));
+                //g.Generate(new HintSelections(HintSelections.Level.Extreme));
                 grid.Generate(null);
                 HintSelections.Level? level;
                 SolveResult solns;

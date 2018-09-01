@@ -1,0 +1,15 @@
+﻿Sudoku File Formats
+
+
+Simple grid format
+
+Optional first line
+ DIAGONAL or DIAGONALS
+
+9 grid lines
+ dot or figures 1-9
+
+Example:
+
+
+
