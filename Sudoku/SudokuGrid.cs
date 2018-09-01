@@ -163,7 +163,17 @@ namespace Sudoku
 
         public void RequestHint()
         {
-            UpdatePaintedHints(true);
+            RequestHint(null);
+        }
+
+        public void RequestHintAt(int selx, int sely)
+        {
+            RequestHint(HintIsAt(selx, sely));
+        }
+
+        void RequestHint(Func<Hint, bool> filter)
+        {
+            UpdatePaintedHints(true, filter);
         }
 
         public Hint[] PaintedHints { get { return paintedHints; } }
@@ -399,26 +409,22 @@ namespace Sudoku
 
             context.PaintPencilMarksAndHints();
         }
-
-        Func<Hint, bool> filter;
-
-        public void UnfilterHints()
+        
+        Func<Hint, bool> HintIsAt(int selx, int sely)
         {
-            filter = null;
-        }
-
-        public void FilterHints(int selx, int sely)
-        {
-            filter = (Hint hint) =>
+            return (Hint hint) =>
             {
                 SudokuRequirement r = (SudokuRequirement)hint.Requirement;
                 if (r != null)
                     return r.AppliesAt(selx, sely, this);
-                return true;
+                SudokuCandidate c = (SudokuCandidate)hint.Candidate;
+                if (c != null)
+                    return c.x == selx && c.y == sely;
+                return false;
             };
         }
 
-        public void UpdatePaintedHints(bool requestedHint)
+        public void UpdatePaintedHints(bool requestedHint, Func<Hint, bool> filter)
         {
             if (InEditMode)
             {
@@ -584,7 +590,7 @@ namespace Sudoku
         public void Updated()
         {
             FireChanged();
-            UpdatePaintedHints(false);
+            UpdatePaintedHints(false, null);
         }
 
         public void RateDifficulty(out HintSelections.Level? result, out SolveResult solns)

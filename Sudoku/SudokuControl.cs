@@ -90,16 +90,14 @@ namespace Sudoku
         void ClearSelection()
         {
             selx = sely = -1;
-            Grid.UnfilterHints();
-            Grid.UpdatePaintedHints(false);
+            Grid.UpdatePaintedHints(false, null);
         }
 
         void MakeSelection(int x, int y)
         {
             selx = x;
             sely = y;
-            Grid.FilterHints(x, y);
-            Grid.UpdatePaintedHints(false);
+            Grid.UpdatePaintedHints(false, null);
         }
 
         void MoveSelection(int dx, int dy)
@@ -123,7 +121,9 @@ namespace Sudoku
             if (hint != null)
             {
                 SudokuCandidate sc = (SudokuCandidate)hint.Candidate;
-                MakeSelection(sc.x, sc.y);
+                // MakeSelection(sc.x, sc.y); -- loses the hint if it was requested with "show hints" off
+                selx = sc.x;
+                sely = sc.y;
                 return true;
             }
             return false;
@@ -199,8 +199,11 @@ namespace Sudoku
                         Utils.Utils.ErrorSound();
                     break;
 
-                case Keys.H:
-                    Grid.RequestHint();
+                case Keys.F1:
+                    if (HasSelection)
+                        Grid.RequestHintAt(selx, sely);
+                    else
+                        Grid.RequestHint();
                     SelectForcedHint();
                     Invalidate();
                     break;
