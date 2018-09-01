@@ -262,33 +262,48 @@ namespace Solver
 
         #region hints
 
-        public Hint[] HintsToPaint(HintFlags ho, HintSelections hs)
+        public IEnumerable<Hint> HintsToPaint(HintFlags ho, HintSelections hs, Func<Hint, bool> filter)
         {
-            List<Hint> ret = new List<Hint>();
-            Requirement c = EasiestRequirement;
-            if (c != null)
+            if (filter == null)
+                filter = (Hint h) => true;
+            bool first = true;
+            foreach (var hint in AllHints(hs).Where(filter))
             {
-                if (c.s == 0)
-                    return new Hint[] { new ImpossibleHint(c) };
-                if (c.s == 1 && hs.ForcedMoves)
-                    return new Hint[] { new ForcedMoveHint(c, c.d.Candidate) };
-                //ret.Add( new ForcedMoveHint(c, c.d) );
+                if (hint.IsIn(hs))
+                {
+                    yield return hint;
+                    if (first && (hint is ImpossibleHint || hint is ForcedMoveHint))
+                        yield break; // Just paint one for that house
+                }
+                first = false;
             }
-            Candidate[] uc = UnselectedCandidates;
-            DiscardableHint[] eventualDiscardableHints;
-            EventualSolutionHint[] eventualSolutionHints;
-            SelectableHint[] selectableHints;
-            BuildEventualHints(out eventualDiscardableHints, out eventualSolutionHints,
-                out selectableHints);
-            if (hs.EventualDiscardables)
-                ret.AddRange(eventualDiscardableHints);
-            else if (hs.ImmediateDiscardables)
-                ret.AddRange(ImmediateDiscardableHints);
-            if (hs.EventualSolutions)
-                ret.AddRange(eventualSolutionHints);
-            if (hs.Selectables)
-                ret.AddRange(selectableHints);
-            return ret.ToArray();
+        }
+
+        public IEnumerable<Hint> AllHints(HintSelections hs)
+        {
+            foreach (var hint in ImpossibleHints)
+                yield return hint;
+            if(hs == null || hs.ForcedMoves)
+                foreach (var hint in ForcedHints)
+                    yield return hint;
+
+            foreach (Candidate k in UnselectedCandidates)
+            {
+                Requirement c;
+                int o, steps;
+                CheckSelectCandidateFollowingSingleOptions(k, out c, out o, out steps);
+                bool eventual = steps > 1;
+                if (o == 0 && (hs == null || (eventual ? hs.EventualDiscardables : hs.ImmediateDiscardables)))
+                    yield return new DiscardableHint(k, c, eventual);
+                if (o == 1 && (hs == null || hs.EventualSolutions))
+                    yield return new EventualSolutionHint(k);
+                if (hs == null || hs.Selectables)
+                {
+                    CheckDiscardCandidateFollowingSingleOptions(k, out c, out o);
+                    if (o == 0)
+                        yield return new SelectableHint(k, c);
+                }
+            }
         }
 
         public ImpossibleHint SingleImpossibleHint
@@ -387,32 +402,6 @@ namespace Solver
                 }
                 return ret.ToArray();
             }
-        }
-
-        public void BuildEventualHints(
-            out DiscardableHint[] eventualDiscardableHints,
-            out EventualSolutionHint[] eventualSolutionHints,
-            out SelectableHint[] selectableHints)
-        {
-            List<DiscardableHint> ret0 = new List<DiscardableHint>();
-            List<EventualSolutionHint> ret1 = new List<EventualSolutionHint>();
-            List<SelectableHint> ret2 = new List<SelectableHint>();
-            foreach (Candidate k in UnselectedCandidates)
-            {
-                Requirement c;
-                int o, steps;
-                CheckSelectCandidateFollowingSingleOptions(k, out c, out o, out steps);
-                if (o == 0)
-                    ret0.Add(new DiscardableHint(k, c, steps > 1));
-                if (o == 1)
-                    ret1.Add(new EventualSolutionHint(k));
-                CheckDiscardCandidateFollowingSingleOptions(k, out c, out o);
-                if (o == 0)
-                    ret2.Add(new SelectableHint(k, c));
-            }
-            eventualDiscardableHints = ret0.ToArray();
-            eventualSolutionHints = ret1.ToArray();
-            selectableHints = ret2.ToArray();
         }
 
         public ImpossibleHint[] ImpossibleHints

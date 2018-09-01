@@ -66,28 +66,40 @@ namespace Sudoku
                     grid.ChangeBox(x, y);
             }
             else if (x == selx && y == sely)
-                selx = sely = -1;
+                ClearSelection();
             else
-            {
-                selx = x;
-                sely = y;
-            }
+                MakeSelection(x, y);
             Invalidate();
         }
 
         void AdvanceSelection()
         {
-            if (!HasSelection)
-                return;
-            Invalidate();
-            selx++;
-            if (selx != Cells)
-                return;
-            selx = 0;
-            sely++;
-            if (sely != Cells)
-                return;
-            sely = 0;
+            if (HasSelection)
+            {
+                if (selx + 1 == Cells)
+                    if (sely + 1 == Cells)
+                        MakeSelection(0, 0);
+                    else
+                        MakeSelection(0, sely + 1);
+                else
+                    MakeSelection(selx + 1, sely);
+                Invalidate();
+            }
+        }
+
+        void ClearSelection()
+        {
+            selx = sely = -1;
+            Grid.UnfilterHints();
+            Grid.UpdatePaintedHints(false);
+        }
+
+        void MakeSelection(int x, int y)
+        {
+            selx = x;
+            sely = y;
+            Grid.FilterHints(x, y);
+            Grid.UpdatePaintedHints(false);
         }
 
         void MoveSelection(int dx, int dy)
@@ -97,8 +109,7 @@ namespace Sudoku
             int nx = selx + dx, ny = sely + dy;
             if (nx < 0 || nx >= Cells || ny < 0 || ny >= Cells)
                 return;
-            selx += dx;
-            sely += dy;
+            MakeSelection(selx + dx, sely + dy);
             Invalidate();
         }
 
@@ -112,8 +123,7 @@ namespace Sudoku
             if (hint != null)
             {
                 SudokuCandidate sc = (SudokuCandidate)hint.Candidate;
-                selx = sc.x;
-                sely = sc.y;
+                MakeSelection(sc.x, sc.y);
                 return true;
             }
             return false;

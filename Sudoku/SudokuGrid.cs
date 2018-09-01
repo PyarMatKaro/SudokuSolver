@@ -400,7 +400,25 @@ namespace Sudoku
             context.PaintPencilMarksAndHints();
         }
 
-        void UpdatePaintedHints(bool requestedHint)
+        Func<Hint, bool> filter;
+
+        public void UnfilterHints()
+        {
+            filter = null;
+        }
+
+        public void FilterHints(int selx, int sely)
+        {
+            filter = (Hint hint) =>
+            {
+                SudokuRequirement r = (SudokuRequirement)hint.Requirement;
+                if (r != null)
+                    return r.AppliesAt(selx, sely, this);
+                return true;
+            };
+        }
+
+        public void UpdatePaintedHints(bool requestedHint)
         {
             if (InEditMode)
             {
@@ -416,7 +434,7 @@ namespace Sudoku
                 //if (hintAutoSolve.ForcedHints)
                 //    solver.FollowSingleOptions();
                 solver.DoLogicalSolve(this, HintAutoSolve);
-                paintedHints = solver.HintsToPaint(HintFlags, HintShow);
+                paintedHints = solver.HintsToPaint(HintFlags, HintShow, filter).ToArray();
             }
             else
             {

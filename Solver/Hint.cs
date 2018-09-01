@@ -20,6 +20,7 @@ namespace Solver
         public abstract Actions Recommendation { get; }
         public abstract Actions Illustration { get; }
         public abstract bool IsComplex { get; }
+        public abstract bool IsIn(HintSelections hs);
 
         public SolveResult Apply(Problem grid)
         {
@@ -69,6 +70,7 @@ namespace Solver
         public override bool IsComplex { get { return false; } }
         public override Actions Recommendation { get { return Actions.Impossible; } }
         public override Actions Illustration { get { return Actions.Select; } }
+        public override bool IsIn(HintSelections hs) { return true; }
 
         public override void PaintBackground(HintPainter context)
         {
@@ -103,7 +105,8 @@ namespace Solver
         public override bool IsComplex { get { return false; } }
         public override Actions Recommendation { get { return Actions.Select; } }
         public override Actions Illustration { get { return Actions.Discard; } }
-        
+        public override bool IsIn(HintSelections hs) { return hs.ForcedMoves; }
+
         public override void PaintBackground(HintPainter context)
         {
             Requirement.PaintBackground(context, Hint.Kind.AmongMust);
@@ -141,7 +144,8 @@ namespace Solver
         public override bool IsComplex { get { return eventual; } }
         public override Actions Recommendation { get { return Actions.Discard; } }
         public override Actions Illustration { get { return Actions.Select; } }
-        
+        public override bool IsIn(HintSelections hs) { return eventual ? hs.EventualDiscardables : hs.ImmediateDiscardables; }
+
         public override void PaintForeground(HintPainter context)
         {
             Candidate.PaintForeground(context, 0);
@@ -171,7 +175,8 @@ namespace Solver
 
         public override Actions Recommendation { get { return Actions.Select; } }
         public override Actions Illustration { get { return Actions.Discard; } }
-        
+        public override bool IsIn(HintSelections hs) { return hs.Selectables; }
+
         public override void PaintForeground(HintPainter context)
         {
             Candidate.PaintForeground(context, Hint.Kind.AmongMust);
@@ -203,6 +208,7 @@ namespace Solver
         public override bool IsComplex { get { return true; } }
         public override Actions Recommendation { get { return Actions.Select; } }
         public override Actions Illustration { get { return Actions.Select; } }
-        
+        public override bool IsIn(HintSelections hs) { return hs.EventualSolutions; }
+
     }
 }
